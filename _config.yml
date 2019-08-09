@@ -3,19 +3,19 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Hexo
-subtitle:
-description:
-keywords:
-author: John Doe
-language:
-timezone:
+title: Tony 字傳
+subtitle: 紀錄 & 分享一切
+description: 希望藉由分享 & 紀錄，來讓自己的生活留下足跡，也希望藉由我的分享來幫助更多的人
+keywords: 
+author: Tony Xu
+language: zh-TW
+timezone: Asia/Taipei
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://yoursite.com
+url: https://blog.dexiang.me
 root: /
-permalink: :year/:month/:day/:title/
+permalink: :category/:title/
 permalink_defaults:
 
 # Directory
@@ -35,7 +35,7 @@ titlecase: false # Transform title into titlecase
 external_link: true # Open external links in new tab
 filename_case: 0
 render_drafts: false
-post_asset_folder: false
+post_asset_folder: true
 relative_link: false
 future: true
 highlight:
@@ -73,9 +73,39 @@ pagination_dir: page
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: landscape
+theme: next-7.3.0
+
+# 自動產生 sitemap
+# Dependencies: https://github.com/hexojs/hexo-generator-sitemap
+# npm install hexo-generator-sitemap --save
+sitemap:
+  path: sitemap.xml
+
+# Dependencies: https://github.com/hexojs/hexo-generator-feed
+# npm install hexo-generator-feed --save
+feed:
+  type: atom
+  path: atom.xml
+  limit: 20
+  hub:
+  content:
+  content_limit: 140
+  content_limit_delim: ' '
+  order_by: -date
+  icon: icon.png
+
+# Dependencies: https://github.com/theme-next/hexo-generator-searchdb
+# npm install hexo-generator-searchdb --save
+search:
+  path: search.xml
+  field: post
+  format: html
+  limit: 10000
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
-  type:
+  type: git
+  repo: git@github.com:dexiang/blog-hexo.git
+  branch: gh-pages
+  message: 
