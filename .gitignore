@@ -1,0 +1,18 @@
+# IntelliJ project files
+.idea
+
+.DS_Store
+Thumbs.db
+
+db.json
+
+# log
+*.log
+
+# npm
+node_modules/
+
+# hexo generate
+public/
+
+.deploy*/
