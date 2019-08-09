@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next muse use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '複製',
+      copy_success: '複製成功',
+      copy_failure: '複製失敗'
+    }
+  };
+</script>
+
+  <meta name="description" content="近年來 Web 的服務越來越多樣化，其中不乏較大流量的服務，不僅增加傳輸的成本，也會拖慢 Browser 處理的時間，因此需要重複的利用之前所緩存的資源。 Caching 機制那就讓我們來看看 Caching 的機制是什麼 在規範（https://tools.ietf.org/html/rfc7234）中將其分為 4.2. Freshness 和 4.3. Validation">
+<meta name="keywords" content="HTTP,Cache,Cache-Control,ETage">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HTTP Caching">
+<meta property="og:url" content="https://blog.dexiang.me/tech/HTTP-Caching/index.html">
+<meta property="og:site_name" content="Tony 字傳">
+<meta property="og:description" content="近年來 Web 的服務越來越多樣化，其中不乏較大流量的服務，不僅增加傳輸的成本，也會拖慢 Browser 處理的時間，因此需要重複的利用之前所緩存的資源。 Caching 機制那就讓我們來看看 Caching 的機制是什麼 在規範（https://tools.ietf.org/html/rfc7234）中將其分為 4.2. Freshness 和 4.3. Validation">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:image" content="https://blog.dexiang.me/tech/HTTP-Caching/Web-browsers-Chrome-Firefox-Safari-Edge-Opera_640x241.png">
+<meta property="og:image" content="https://blog.dexiang.me/tech/HTTP-Caching/http-cache-control.png">
+<meta property="og:image" content="https://blog.dexiang.me/tech/HTTP-Caching/http-cache-hierarchy.png">
+<meta property="og:updated_time" content="2019-08-09T04:18:50.192Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="HTTP Caching">
+<meta name="twitter:description" content="近年來 Web 的服務越來越多樣化，其中不乏較大流量的服務，不僅增加傳輸的成本，也會拖慢 Browser 處理的時間，因此需要重複的利用之前所緩存的資源。 Caching 機制那就讓我們來看看 Caching 的機制是什麼 在規範（https://tools.ietf.org/html/rfc7234）中將其分為 4.2. Freshness 和 4.3. Validation">
+<meta name="twitter:image" content="https://blog.dexiang.me/tech/HTTP-Caching/Web-browsers-Chrome-Firefox-Safari-Edge-Opera_640x241.png">
+  <link rel="alternate" href="/atom.xml" title="Tony 字傳" type="application/atom+xml">
+  <link rel="canonical" href="https://blog.dexiang.me/tech/HTTP-Caching/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>HTTP Caching | Tony 字傳</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Tony 字傳</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">紀錄 & 分享一切</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首頁</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-technology">
+      
+    
+
+    <a href="/categories/tech/" rel="section"><i class="menu-item-icon fa fa-fw fa-code"></i> <br>科技</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>標籤</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>歸檔</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜尋</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜尋..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.dexiang.me/tech/HTTP-Caching/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Tony Xu">
+      <meta itemprop="description" content="希望藉由分享 & 紀錄，來讓自己的生活留下足跡，也希望藉由我的分享來幫助更多的人">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tony 字傳">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">HTTP Caching
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-02-01 15:02:39" itemprop="dateCreated datePublished" datetime="2018-02-01T15:02:39+08:00">2018-02-01</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2019-08-09 12:18:50" itemprop="dateModified" datetime="2019-08-09T12:18:50+08:00">2019-08-09</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/tech/" itemprop="url" rel="index"><span itemprop="name">tech</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          <br>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <img src="/tech/HTTP-Caching/Web-browsers-Chrome-Firefox-Safari-Edge-Opera_640x241.png" title="Browsers">
+
+<p>近年來 Web 的服務越來越多樣化，其中不乏較大流量的服務，不僅增加傳輸的成本，也會拖慢 Browser 處理的時間，因此需要重複的利用之前所緩存的資源。</p>
+<h2 id="Caching-機制"><a href="#Caching-機制" class="headerlink" title="Caching 機制"></a>Caching 機制</h2><p>那就讓我們來看看 Caching 的機制是什麼</p>
+<p>在規範（<a href="https://tools.ietf.org/html/rfc7234" target="_blank" rel="noopener">https://tools.ietf.org/html/rfc7234</a>）中將其分為 4.2. Freshness 和 4.3. Validation </p>
+<a id="more"></a>
+
+<h3 id="Freshness"><a href="#Freshness" class="headerlink" title="Freshness"></a>Freshness</h3><p>Cache Control &amp; Expires 用來確認本地端的檔案是否過期，若是沒有過期則可以不需向 Server 驗證就可直接使用，就可以避免網路造成的延遲及傳輸成本。</p>
+<blockquote>
+<p>補充說明：<br>在 HTTP1.0 中定義了 <code>Expires</code>，Expires 的值是一個明確的過期時間，但這會碰到一個問題，因為 Expires 的時間是本地的時間，可能會與 Server 的不一致。<br>因此在 HTTP1.1 中新添加了 <code>Cache-Control</code>，實現了更完整的 Caching 聲明；如 max-age 配置，用來表示檔案多久過期，而不是直接表示過期時間。<br>假設設定值為：<code>Cache-Control: max-age=30</code>，在當前 Request 的 30 秒之內再次請求，則會取用 Cache，超過則會再次發送 Request。<br>而根據 <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.3" target="_blank" rel="noopener">RFC2616</a> 的定義：<code>max-age</code> 會蓋過 Expires。</p>
+<blockquote>
+<p>If a response includes both an Expires header and a max-age directive, the max-age directive overrides the Expires header, even if the Expires header is more restrictiv</p>
+</blockquote>
+</blockquote>
+<h3 id="Validation"><a href="#Validation" class="headerlink" title="Validation"></a>Validation</h3><p>Last-Modified &amp; ETag 則是用來確認本地端的檔案是否與 Server 端的檔案符合，在 Browser 判斷 Cache 可能過期後則會向 Server 驗證檔案的一致性，若驗證通過則 Server 回覆 HTTP Status Code 304，否則返回 200 並回覆新的內容。</p>
+<blockquote>
+<p>補充說明：<br>在 HTTP1.0 中定義了 <code>Last-Modified</code>，當 Server 端回覆的 Response 中含有 Last-Modified（表示這個檔案的最後一次更新時間），則下次 Client 端送出的 Request 中為了要驗證是否有更新則會夾帶 <code>If-Modified-Since</code>（上次收到的 Last-Modified 值）給 Server 判斷。但 Last-Modified 還是有需要加強的地方，像是用時間來紀錄更新的狀態，但卻不代表檔案真的被更新過，另外時間的單位只有到秒，也不足代表。<br>在 HTTP1.1 增加了 <code>Etag</code>，是利用類似 hash 的原理，來代表檔案是否一致，與 <code>If-None-Match</code> 標籤對應，但 Etag 在部分使用情境上還是會有問題，像是 Apache 中的 ETag 是用 inode、檔案大小和最後修改時間來產生的，在有負載平衡架構下，不同機器就會產生出不一樣的 ETag，但由於一般來說都會使用 CDN 技術，就交由專業的處理了。</p>
+</blockquote>
+<p>主要就是透過 Freshness &amp; Validation 這兩個機制來去做 Caching，以下舉個例子來了解一下吧：（為了方便理解，裡面的 Key &amp; Value 並非實際數值）</p>
+<p>假設我第一次跟某個網站要了一張圖得到的回覆是（2018-01-01 13:00:00）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Response Header</span><br><span class="line">Cache-Control: max-age=30day</span><br><span class="line">Last-Modified: 2017-12-25 10:00:00</span><br><span class="line">ETag: validation_key</span><br></pre></td></tr></table></figure>
+
+<p>收到後就將其存進本地 Cache，在 10 天後我再次訪問這張圖片時，Browser 告訴我：『本地就有存擋了喔，直接給你吧』，於是就不發送請求，直接取用  Cache，Browser 會回應 <code>200 OK (form disk cache)</code></p>
+<p>然後又過了一個月後我再次去看了這張圖，這次 Browser 發現已經過期了，所以它就送了 Request 去問 Server 這張圖從 2017-12-25 10:00:00 後有沒有更新</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Request Header</span><br><span class="line">If-Modified-Since: 2017-12-25 10:00:00</span><br><span class="line">If-None-Match: validation_key</span><br></pre></td></tr></table></figure>
+
+<p>要是更新了，Server 就會回覆 HTTP Status Code 200 並給予新的檔案<br>若是沒有更新則 Server 會回覆 <code>304 Not Modified</code>，就繼續拿本地的 Cache 來用</p>
+<p>介紹完了概念後，來補充一些細部的解釋吧～</p>
+<h2 id="Cache-Control"><a href="#Cache-Control" class="headerlink" title="Cache-Control"></a>Cache-Control</h2><p>最快的連線就是不要連線，透過本地的緩存，減少不必要的成本，這就要透過 Cache-Control 的設定了</p>
+<img src="/tech/HTTP-Caching/http-cache-control.png" title="Cache-Control">
+
+<h3 id="no-cache-amp-no-store"><a href="#no-cache-amp-no-store" class="headerlink" title="no-cache &amp; no-store"></a>no-cache &amp; no-store</h3><ul>
+<li>no-cache 表示必須要跟 Server 確認檔案的一致性，不論過期與否，若驗證（ETag）通過，則可直接存取本地緩存</li>
+<li>no-store 就更加簡單了，就是禁止在本地儲存任何的緩存，每次的請求都會由 Server 給予完整的回應</li>
+</ul>
+<h3 id="public-amp-private"><a href="#public-amp-private" class="headerlink" title="public &amp; private"></a>public &amp; private</h3><ul>
+<li>public 表公開資訊，可被緩存，但通常不另外設定</li>
+<li>private 表私人資訊，不允許中繼快取（如 CDN）</li>
+</ul>
+<h3 id="max-age"><a href="#max-age" class="headerlink" title="max-age"></a>max-age</h3><p>表示從請求後開始可緩存的時間（秒）</p>
+<h2 id="HTTP-Status-200-OK-form-disk-cache-與-304-Not-Modified"><a href="#HTTP-Status-200-OK-form-disk-cache-與-304-Not-Modified" class="headerlink" title="HTTP Status 200 OK (form disk cache) 與 304 Not Modified"></a>HTTP Status 200 OK (form disk cache) 與 304 Not Modified</h2><p>先來了解什麼是  200 OK (form disk cache) 與 304 Not Modified</p>
+<ul>
+<li>200 OK (form disk cache)：<br>是表示 Browser 沒有跟 Server 確認，就直接使用了本地的 cache</li>
+<li>304 Not Modified：<br>是表示 Browser 跟 Server 確認 cache 的可用性後再使用</li>
+</ul>
+<h2 id="Cache-的更新及作廢"><a href="#Cache-的更新及作廢" class="headerlink" title="Cache 的更新及作廢"></a>Cache 的更新及作廢</h2><p>依照上面的機制，當 Client Caching 後就只能等它到期後再更新成 Server 上的內容，但是若是我想要 patch 怎麼辦呢？最簡單的方式就是變更請求的位置<br>但如果我們沒有辦法變更呢？很抱歉，只能告訴你，做不到了…<br>所以我們可以設想一下如何才能設計一個魚與熊掌兼得的架構呢？  </p>
+<p>其實我們只要混用剛剛所說的就可以了，參考下面的圖例</p>
+<img src="/tech/HTTP-Caching/http-cache-hierarchy.png" title="cache hierarchy">
+
+<p>我們藉由給予每個不同的資源不同的快取策略，定義 “快取階層”，如此一來，同時達成用戶端快取和快速更新。</p>
+<ul>
+<li>HTML 標記為 <code>no-cache</code>，這表示瀏覽器在每次請求時都會重新驗證文件，如果內容變更，就會拿到最新版本。同時，在 HTML 標記中，我們在 CSS 和 JavaScript 資源的網址中嵌入指紋碼：如果這些檔案的內容變更，網頁的 HTML 也會隨之變更，並將下載 HTML 回應的新副本。</li>
+<li>允許瀏覽器和中繼快取 (例如 CDN) 快取 CSS，期限設定為 1 年。請注意，我們可以放心使用 1 年的「遠期期限」，因為我們在檔案名稱中嵌入了檔案指紋碼：如果 CSS 更新，網址也會隨之變更。</li>
+<li>JavaScript 期限也設定為 1 年，但是被標記為「private」，也許是因為其中包含了不適合 CDN 快取的使用者私人資料。</li>
+<li>快取圖片時不包含版本或唯一指紋碼，期限設定為 1 天。</li>
+</ul>
+<h2 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h2><ul>
+<li><a href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching?hl=zh-tw" target="_blank" rel="noopener">HTTP 快取 - Google Web Developers</a></li>
+<li><a href="https://blog.techbridge.cc/2017/06/17/cache-introduction/" target="_blank" rel="noopener">循序漸進理解 HTTP Cache 機制 - TechBridge 技術共筆部落格</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/HTTP/" rel="tag"># HTTP</a>
+          
+            <a href="/tags/Cache/" rel="tag"># Cache</a>
+          
+            <a href="/tags/Cache-Control/" rel="tag"># Cache-Control</a>
+          
+            <a href="/tags/ETage/" rel="tag"># ETage</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/tech/go-introduction/" rel="next" title="Go 介紹">
+                <i class="fa fa-chevron-left"></i> Go 介紹
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/tech/File-Locking/" rel="prev" title="File Locking">
+                File Locking <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Tony Xu</p>
+  <div class="site-description motion-element" itemprop="description">希望藉由分享 & 紀錄，來讓自己的生活留下足跡，也希望藉由我的分享來幫助更多的人</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">30</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分類</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">69</span>
+        <span class="site-state-item-name">標籤</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/dexiang" title="GitHub &rarr; https://github.com/dexiang" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://www.linkedin.com/in/tony-xu/" title="Linkedin &rarr; https://www.linkedin.com/in/tony-xu/" rel="noopener" target="_blank"><i class="fa fa-fw fa-linkedin"></i>Linkedin</a>
+      </span>
+    
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Caching-機制"><span class="nav-number">1.</span> <span class="nav-text">Caching 機制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Freshness"><span class="nav-number">1.1.</span> <span class="nav-text">Freshness</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Validation"><span class="nav-number">1.2.</span> <span class="nav-text">Validation</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Cache-Control"><span class="nav-number">2.</span> <span class="nav-text">Cache-Control</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#no-cache-amp-no-store"><span class="nav-number">2.1.</span> <span class="nav-text">no-cache &amp; no-store</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#public-amp-private"><span class="nav-number">2.2.</span> <span class="nav-text">public &amp; private</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#max-age"><span class="nav-number">2.3.</span> <span class="nav-text">max-age</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-Status-200-OK-form-disk-cache-與-304-Not-Modified"><span class="nav-number">3.</span> <span class="nav-text">HTTP Status 200 OK (form disk cache) 與 304 Not Modified</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Cache-的更新及作廢"><span class="nav-number">4.</span> <span class="nav-text">Cache 的更新及作廢</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#參考資料"><span class="nav-number">5.</span> <span class="nav-text">參考資料</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tony Xu</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 強力驅動 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主題 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next muse use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '複製',
+      copy_success: '複製成功',
+      copy_failure: '複製失敗'
+    }
+  };
+</script>
+
+  <meta name="description" content="FFmpeg 為開源的影音處理框架，可幫助我們進行影音的格式轉換、分離、混合、過濾等等，支援格式 也非常的廣泛，也可以在多個作業系統及硬體架構上運作。同時也支援多種函式庫，更增加使用上的彈性，依照需求建立出最適合的工具。">
+<meta name="keywords" content="FFmpeg">
+<meta property="og:type" content="article">
+<meta property="og:title" content="FFmpeg 多媒體框架">
+<meta property="og:url" content="https://blog.dexiang.me/tech/FFmpeg-introduction/index.html">
+<meta property="og:site_name" content="Tony 字傳">
+<meta property="og:description" content="FFmpeg 為開源的影音處理框架，可幫助我們進行影音的格式轉換、分離、混合、過濾等等，支援格式 也非常的廣泛，也可以在多個作業系統及硬體架構上運作。同時也支援多種函式庫，更增加使用上的彈性，依照需求建立出最適合的工具。">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:image" content="https://blog.dexiang.me/tech/FFmpeg-introduction/ffmpeg.png">
+<meta property="og:updated_time" content="2019-08-09T04:18:50.176Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="FFmpeg 多媒體框架">
+<meta name="twitter:description" content="FFmpeg 為開源的影音處理框架，可幫助我們進行影音的格式轉換、分離、混合、過濾等等，支援格式 也非常的廣泛，也可以在多個作業系統及硬體架構上運作。同時也支援多種函式庫，更增加使用上的彈性，依照需求建立出最適合的工具。">
+<meta name="twitter:image" content="https://blog.dexiang.me/tech/FFmpeg-introduction/ffmpeg.png">
+  <link rel="alternate" href="/atom.xml" title="Tony 字傳" type="application/atom+xml">
+  <link rel="canonical" href="https://blog.dexiang.me/tech/FFmpeg-introduction/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>FFmpeg 多媒體框架 | Tony 字傳</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Tony 字傳</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">紀錄 & 分享一切</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首頁</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-technology">
+      
+    
+
+    <a href="/categories/tech/" rel="section"><i class="menu-item-icon fa fa-fw fa-code"></i> <br>科技</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>標籤</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>歸檔</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜尋</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜尋..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.dexiang.me/tech/FFmpeg-introduction/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Tony Xu">
+      <meta itemprop="description" content="希望藉由分享 & 紀錄，來讓自己的生活留下足跡，也希望藉由我的分享來幫助更多的人">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tony 字傳">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">FFmpeg 多媒體框架
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2017-12-20 17:04:38" itemprop="dateCreated datePublished" datetime="2017-12-20T17:04:38+08:00">2017-12-20</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2019-08-09 12:18:50" itemprop="dateModified" datetime="2019-08-09T12:18:50+08:00">2019-08-09</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/tech/" itemprop="url" rel="index"><span itemprop="name">tech</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          <br>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <img src="/tech/FFmpeg-introduction/ffmpeg.png" title="FFmpeg">
+
+<p>FFmpeg 為開源的影音處理框架，可幫助我們進行影音的格式轉換、分離、混合、過濾等等，<a href="http://ffmpeg.org/general.html#Supported-File-Formats_002c-Codecs-or-Features" target="_blank" rel="noopener">支援格式</a> 也非常的廣泛，也可以在多個作業系統及硬體架構上運作。同時也支援多種函式庫，更增加使用上的彈性，依照需求建立出最適合的工具。</p>
+<a id="more"></a>
+
+<p>FFmpeg 包含許多的函式庫</p>
+<ul>
+<li>libavcodec：用來編碼與解碼不同的影音格式</li>
+<li>libavutil：一些程式上會用到的函式與資料結構</li>
+<li>libavformat：用來處理承載影音串流的多媒體容器</li>
+<li>libavfilter：用來進行視訊和音訊的濾鏡處理</li>
+<li>libavdevice：用來從不同的裝置輸入多媒體，或是將多媒體輸出至不同裝置</li>
+<li>libswscale：用極佳的方式縮放影像，也可以用來轉換色彩空間</li>
+<li>libswresample：用極佳的方式處理音訊取樣</li>
+</ul>
+<p>還可以支援其他的第三方函式庫，如：<code>libx264</code>、<code>libvpx</code>、<code>libfdk_aac</code>；依照這些函式庫 FFmpeg 提供了許多的工具：</p>
+<ul>
+<li>ffmpeg：Command line tool，用來轉換不同格式的多媒體檔案</li>
+<li>ffserver：用於線上廣播的多媒體串流伺服器</li>
+<li>ffplay：基於 SDL 和 FFmpeg 函式庫的簡易播放器</li>
+<li>ffprobe：簡易的多媒體串流分析工具</li>
+</ul>
+<h2 id="安裝"><a href="#安裝" class="headerlink" title="安裝"></a>安裝</h2><p>安裝的部分就略過了，官方提供的方式非常多元，可參照官網上的敘述：<a href="https://www.ffmpeg.org/" target="_blank" rel="noopener">https://www.ffmpeg.org/</a>，我個人因為用的是 Mac，採用的是 Homebrew 安裝管理</p>
+<p>再來就是重頭戲了～～～<br>因為 FFmpeg 的功能非常強大，也涉及一些影音的知識，我這裡就先就操作和流程去說，其他的再慢慢補完：</p>
+<h2 id="語法結構"><a href="#語法結構" class="headerlink" title="語法結構"></a>語法結構</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ffmpeg [全域選項] &#123;[輸入選項] -i 輸入檔案路徑&#125; ... &#123;[輸出選項] 輸出檔案路徑&#125; ...</span><br></pre></td></tr></table></figure>
+
+<p>支持多個輸入和輸出，所以 <code>...</code> 代表可傳入多個的意思</p>
+<h2 id="運作流程"><a href="#運作流程" class="headerlink" title="運作流程"></a>運作流程</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"> _______              ______________</span><br><span class="line">|       |            |              |</span><br><span class="line">| input |  demuxer   | encoded data |   decoder</span><br><span class="line">| file  | ---------&gt; | packets      | -----+</span><br><span class="line">|_______|            |______________|      |</span><br><span class="line">                                           v</span><br><span class="line">                                       _________</span><br><span class="line">                                      |         |</span><br><span class="line">                                      | decoded |</span><br><span class="line">                                      | frames  |</span><br><span class="line">                                      |_________|</span><br><span class="line"> ________             ______________       |</span><br><span class="line">|        |           |              |      |</span><br><span class="line">| output | &lt;-------- | encoded data | &lt;----+</span><br><span class="line">| file   |   muxer   | packets      |   encoder</span><br><span class="line">|________|           |______________|</span><br></pre></td></tr></table></figure>
+
+<p>用 <code>libavformat</code> 來分離輸入的檔案，再利用 decoder 去解出非壓縮的內容，再透過 filter 過濾，經過壓縮後再混合成新的檔案。</p>
+<p>上述的圖再編碼之前還可以進一步被 filter 處理（使用 <code>libavfilter</code> 函式庫），而 filter 可組成 filtergraphs，filtergraphs 在依照輸入及輸出可分成 Simple filtergraphs &amp; Complex filtergraphs。</p>
+<h3 id="Simple-filtergraphs"><a href="#Simple-filtergraphs" class="headerlink" title="Simple filtergraphs"></a>Simple filtergraphs</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"> _________                        ______________</span><br><span class="line">|         |                      |              |</span><br><span class="line">| decoded |                      | encoded data |</span><br><span class="line">| frames  |\                   _ | packets      |</span><br><span class="line">|_________| \                  /||______________|</span><br><span class="line">             \   __________   /</span><br><span class="line">  simple     _\||          | /  encoder</span><br><span class="line">  filtergraph   | filtered |/</span><br><span class="line">                | frames   |</span><br><span class="line">                |__________|</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"> _________                 __________               ______________</span><br><span class="line">|         |               |          |             |              |</span><br><span class="line">| decoded | ----------&gt;   | filtered | ----------&gt; | encoded data |</span><br><span class="line">| frames  |    simple     | frames   |    encoder  | packets      |</span><br><span class="line">|_________|  filtergraph  |__________|             |______________|</span><br></pre></td></tr></table></figure>
+
+<p>Simple filtergraphs 透過 <code>-filter</code> 來做設定，以下是一個 Simple filtergraphs 的範例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"> _______        _____________        _______        ________</span><br><span class="line">|       |      |             |      |       |      |        |</span><br><span class="line">| input | ---&gt; | deinterlace | ---&gt; | scale | ---&gt; | output |</span><br><span class="line">|_______|      |_____________|      |_______|      |________|</span><br></pre></td></tr></table></figure>
+
+<h3 id="Complex-filtergraphs"><a href="#Complex-filtergraphs" class="headerlink" title="Complex filtergraphs"></a>Complex filtergraphs</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"> _________</span><br><span class="line">|         |</span><br><span class="line">| input 0 |\                     __________</span><br><span class="line">|_________| \                   |          |</span><br><span class="line">             \    _________    /| output 0 |</span><br><span class="line">              \  |         |  / |__________|</span><br><span class="line"> _________    _\|| complex | /</span><br><span class="line">|         |      |         |/</span><br><span class="line">| input 1 |----&gt; | filter  |\</span><br><span class="line">|_________|   _  |         | \   __________</span><br><span class="line">               /|| graph   |  \ |          |</span><br><span class="line">              /  |         |   \| output 1 |</span><br><span class="line"> _________   /   |_________|    |__________|</span><br><span class="line">|         | /</span><br><span class="line">| input 2 |/</span><br><span class="line">|_________|</span><br></pre></td></tr></table></figure>
+
+<p>Complex filtergraphs 透過 <code>-filter_complex</code> 這個全域選項來做設定</p>
+<h3 id="Stream-Copy"><a href="#Stream-Copy" class="headerlink" title="Stream Copy"></a>Stream Copy</h3><p>再來我們聊聊 Stream copy，有時候我們並無意改變 Codec，只想改變 video 的 container，那麼我們可以用 <code>-code copy</code> 來做設定，但同時也意味著沒有經過解碼及編碼階段，也不會有 filter 的處理。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"> _______              ______________            ________</span><br><span class="line">|       |            |              |          |        |</span><br><span class="line">| input |  demuxer   | encoded data |  muxer   | output |</span><br><span class="line">| file  | ---------&gt; | packets      | -------&gt; | file   |</span><br><span class="line">|_______|            |______________|          |________|</span><br></pre></td></tr></table></figure>
+
+<h2 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h2><p><a href="https://www.ffmpeg.org/ffmpeg.html" target="_blank" rel="noopener">ffmpeg Documentation</a></p>
+<p><a href="https://www.mobile01.com/topicdetail.php?f=510&t=3734550" target="_blank" rel="noopener">FFmpeg - 泛用影音轉換工具 - Mobile01</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/FFmpeg/" rel="tag"># FFmpeg</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/tech/OWASP-2017/" rel="next" title="OWASP Top 10 2017">
+                <i class="fa fa-chevron-left"></i> OWASP Top 10 2017
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/tech/FFmpeg-Common-Options/" rel="prev" title="FFmpeg 常用選項">
+                FFmpeg 常用選項 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Tony Xu</p>
+  <div class="site-description motion-element" itemprop="description">希望藉由分享 & 紀錄，來讓自己的生活留下足跡，也希望藉由我的分享來幫助更多的人</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">30</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分類</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">69</span>
+        <span class="site-state-item-name">標籤</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/dexiang" title="GitHub &rarr; https://github.com/dexiang" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://www.linkedin.com/in/tony-xu/" title="Linkedin &rarr; https://www.linkedin.com/in/tony-xu/" rel="noopener" target="_blank"><i class="fa fa-fw fa-linkedin"></i>Linkedin</a>
+      </span>
+    
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#安裝"><span class="nav-number">1.</span> <span class="nav-text">安裝</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#語法結構"><span class="nav-number">2.</span> <span class="nav-text">語法結構</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#運作流程"><span class="nav-number">3.</span> <span class="nav-text">運作流程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Simple-filtergraphs"><span class="nav-number">3.1.</span> <span class="nav-text">Simple filtergraphs</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Complex-filtergraphs"><span class="nav-number">3.2.</span> <span class="nav-text">Complex filtergraphs</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Stream-Copy"><span class="nav-number">3.3.</span> <span class="nav-text">Stream Copy</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#參考資料"><span class="nav-number">4.</span> <span class="nav-text">參考資料</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tony Xu</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 強力驅動 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主題 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

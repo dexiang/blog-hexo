@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next muse use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '複製',
+      copy_success: '複製成功',
+      copy_failure: '複製失敗'
+    }
+  };
+</script>
+
+  <meta name="description" content="這禮拜一去參加了 OWASP 2017 的研討會，其中提到了新發佈的 OWASP Top 10 2017版；先回頭來談一下什麼是 OWASP，在開發系統時，除了功能以外，安全也是必須要著重且注意的，在快速開發的過程中，常常會沒有兼顧到安全這塊；對於部分各戶來說，在還未出包之前大概也不會感覺到資安的重要；OWASP 就統整了十大弱點排名（當然啦～不是只有這十個需要重視）， 最近的一次正式更新是在 2">
+<meta name="keywords" content="OWASP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OWASP Top 10 2017">
+<meta property="og:url" content="https://blog.dexiang.me/tech/OWASP-2017/index.html">
+<meta property="og:site_name" content="Tony 字傳">
+<meta property="og:description" content="這禮拜一去參加了 OWASP 2017 的研討會，其中提到了新發佈的 OWASP Top 10 2017版；先回頭來談一下什麼是 OWASP，在開發系統時，除了功能以外，安全也是必須要著重且注意的，在快速開發的過程中，常常會沒有兼顧到安全這塊；對於部分各戶來說，在還未出包之前大概也不會感覺到資安的重要；OWASP 就統整了十大弱點排名（當然啦～不是只有這十個需要重視）， 最近的一次正式更新是在 2">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:image" content="https://blog.dexiang.me/tech/OWASP-2017/OWASP_Top_10_2013_with_2017_800x446.png">
+<meta property="og:updated_time" content="2019-08-09T04:18:50.199Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="OWASP Top 10 2017">
+<meta name="twitter:description" content="這禮拜一去參加了 OWASP 2017 的研討會，其中提到了新發佈的 OWASP Top 10 2017版；先回頭來談一下什麼是 OWASP，在開發系統時，除了功能以外，安全也是必須要著重且注意的，在快速開發的過程中，常常會沒有兼顧到安全這塊；對於部分各戶來說，在還未出包之前大概也不會感覺到資安的重要；OWASP 就統整了十大弱點排名（當然啦～不是只有這十個需要重視）， 最近的一次正式更新是在 2">
+<meta name="twitter:image" content="https://blog.dexiang.me/tech/OWASP-2017/OWASP_Top_10_2013_with_2017_800x446.png">
+  <link rel="alternate" href="/atom.xml" title="Tony 字傳" type="application/atom+xml">
+  <link rel="canonical" href="https://blog.dexiang.me/tech/OWASP-2017/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>OWASP Top 10 2017 | Tony 字傳</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Tony 字傳</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">紀錄 & 分享一切</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首頁</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-technology">
+      
+    
+
+    <a href="/categories/tech/" rel="section"><i class="menu-item-icon fa fa-fw fa-code"></i> <br>科技</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>標籤</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>歸檔</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜尋</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜尋..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.dexiang.me/tech/OWASP-2017/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Tony Xu">
+      <meta itemprop="description" content="希望藉由分享 & 紀錄，來讓自己的生活留下足跡，也希望藉由我的分享來幫助更多的人">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tony 字傳">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">OWASP Top 10 2017
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2017-11-21 16:04:35" itemprop="dateCreated datePublished" datetime="2017-11-21T16:04:35+08:00">2017-11-21</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2019-08-09 12:18:50" itemprop="dateModified" datetime="2019-08-09T12:18:50+08:00">2019-08-09</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/tech/" itemprop="url" rel="index"><span itemprop="name">tech</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          <br>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>這禮拜一去參加了 OWASP 2017 的研討會，其中提到了新發佈的 OWASP Top 10 2017版；先回頭來談一下什麼是 OWASP，在開發系統時，除了功能以外，安全也是必須要著重且注意的，在快速開發的過程中，常常會沒有兼顧到安全這塊；對於部分各戶來說，在還未出包之前大概也不會感覺到資安的重要；OWASP 就統整了十大弱點排名（當然啦～不是只有這十個需要重視）， 最近的一次正式更新是在 2013 年，在這過程中資訊的進步很快，排名也略有變動。</p>
+<img src="/tech/OWASP-2017/OWASP_Top_10_2013_with_2017_800x446.png" title="OWASP Top 10">
+
+<p>在研討會中也提到了最新的 OWASP Top 10 2017，與 2013 年比較第一名依舊是 Injection，第二名是身份驗證；然而新版的因考慮了現在的系統採用了許多的 API 讓前後端分離，也搜集了實際企業的 Log 數據，可以從排名中看出都跟最近流行的微服務有關。</p>
+<a id="more"></a>
+
+<h2 id="Top-1-Injection"><a href="#Top-1-Injection" class="headerlink" title="Top 1: Injection"></a>Top 1: Injection</h2><p><strong>Injection（注入攻擊）</strong></p>
+<p>將不安全的數據傳送到解析器中，當作指令（Command）或查詢（Query），產生如 SQL Injection、LDAP Injection 等等的 Injection 缺陷。攻擊者就可以用惡意的資料欺騙解析器，進而達到竄改資料或執行非預期的指令。</p>
+<h2 id="Top-2-Broken-Authentication-and-Session-Management"><a href="#Top-2-Broken-Authentication-and-Session-Management" class="headerlink" title="Top 2: Broken Authentication and Session Management"></a>Top 2: Broken Authentication and Session Management</h2><p><strong>Broken Authentication and Session Management（無效身分認證和 Session 管理）</strong></p>
+<p>許多系統常會需要身份驗證才能操作，但要是導入方式不正確，反而可能被有駭客取得駭客取得密碼、金鑰、Session 令牌，用來冒用其他用戶身份。</p>
+<h2 id="Top-3-Sensitive-Data-Exposure"><a href="#Top-3-Sensitive-Data-Exposure" class="headerlink" title="Top 3: Sensitive Data Exposure"></a>Top 3: Sensitive Data Exposure</h2><p><strong>Sensitive Data Exposure（敏感資料外洩）</strong></p>
+<p>許多系統常會牽涉到一些敏感資料，如個人資料、金融資訊、醫療保健數據等等，若是對資料的保護不足，就可能被駭客取得，進而造成身份偽造、盜竊等行為，固對這些敏感數據應做額外的加密保護，不論是在傳輸的過程中、儲存、瀏覽器瀏覽的過程中都是。</p>
+<h2 id="Top-4-XML-External-Entity-XXE"><a href="#Top-4-XML-External-Entity-XXE" class="headerlink" title="Top 4: XML External Entity(XXE)"></a>Top 4: XML External Entity(XXE)</h2><p><strong>XML External Entity(XXE)（XML外部處理器漏洞）</strong></p>
+<p>XXE 漏洞發生在程式解析 XML 輸入時，沒有禁止外部實體的載入。在以 XML 為基礎的服務中若沒有管控權限，直接接受 XML 的請求，就有可能被惡意的 XML 文件影響，導致敏感數據被竊取、遠程代碼執行、取得機器上檔案的存取權、DoS（阻斷式服務）、掃描內網等等。</p>
+<h2 id="Top-5-Broken-Access-Control"><a href="#Top-5-Broken-Access-Control" class="headerlink" title="Top 5: Broken Access Control"></a>Top 5: Broken Access Control</h2><p><strong>Broken Access Control（無效的存取控管）</strong><br>Insecure Direct Object References &amp; Missing Function Level Access Control</p>
+<p>是由 2013 年的 Insecure Direct Object References 和 Missing Function Level Access Control 合併而來；系統需對用戶的身份做適當的存取管控，駭客會利用控管的漏洞去存取沒有經過授權的功能或察看敏感資料、修改使用者數據、更改訪問權限等。</p>
+<h2 id="Top-6-Security-Misconfiguration"><a href="#Top-6-Security-Misconfiguration" class="headerlink" title="Top 6: Security Misconfiguration"></a>Top 6: Security Misconfiguration</h2><p><strong>Security Misconfiguration（不安全的組態設定）</strong></p>
+<p>一般來說都是開發者使用了不安全的設定值，像是 HTTP  header、AWS S3 bucket 權限控管等等，系統的設定也要跟版本和漏洞配合，確保系統安全無虞。</p>
+<h2 id="Top-7-Cross-Site-Scripting-XSS"><a href="#Top-7-Cross-Site-Scripting-XSS" class="headerlink" title="Top 7: Cross-Site Scripting(XSS)"></a>Top 7: Cross-Site Scripting(XSS)</h2><p><strong>Cross-Site Scripting(XSS)（跨站腳本攻擊）</strong></p>
+<p>當應用程式未將使用者提供的資料先審核或進行內容編碼，就直接將資料傳輸到網路瀏覽器，即可能發生 XSS 問題。XSS 能讓攻擊者直接在受害者的網路瀏覽器上執行 Script，攻擊者便可以綁架用戶的 Session 或竄改網站內容等。<br>XSS 一直是是網站攻擊排行榜上有名的，有太多種可能性可以執行 JavaScript，只要有一點機會就會讓駭客有機可趁。</p>
+<h2 id="Top-8-Insecure-Deserialization"><a href="#Top-8-Insecure-Deserialization" class="headerlink" title="Top 8: Insecure Deserialization"></a>Top 8: Insecure Deserialization</h2><p><strong>Insecure Deserialization（不安全的反序列化漏洞）</strong></p>
+<p>當系統收到惡意的序列化物件時（如 JSON、XML），在反序列化時會出現不安全缺陷，駭客可透過這個過程竄改變數或更甚於影響到程式執行。</p>
+<h2 id="Top-9-Using-Components-with-Known-Vulnerabilities"><a href="#Top-9-Using-Components-with-Known-Vulnerabilities" class="headerlink" title="Top 9: Using Components with Known Vulnerabilities"></a>Top 9: Using Components with Known Vulnerabilities</h2><p><strong>Using Components with Known Vulnerabilities（使用已有漏洞的元件）</strong></p>
+<p>現今的開發常會用到現成的元件、套件、Framework，要時常確認現在的版本有無缺陷或更新。</p>
+<h2 id="Top-10-Insufficient-Logging-amp-Monitoring"><a href="#Top-10-Insufficient-Logging-amp-Monitoring" class="headerlink" title="Top 10: Insufficient Logging &amp; Monitoring"></a>Top 10: Insufficient Logging &amp; Monitoring</h2><p><strong>Insufficient Logging &amp; Monitoring（紀錄與監控不足風險）</strong></p>
+<p>完整 Log 紀錄及監控能夠讓我們更了解系統在運行的過程中是否正常，是否有駭客入侵或竄改系統的紀錄，在會議中也提到，依數據顯示：大多數的缺陷被檢測出的時間超過 200 天，顯示了紀錄與監控不足。</p>
+<h2 id="同場加映："><a href="#同場加映：" class="headerlink" title="同場加映："></a>同場加映：</h2><p><strong>Cross-Site Request Forgery(CSRF)（跨站請求偽造）</strong></p>
+<p>跨站請求攻擊，簡單地說，是攻擊者通過一些技術手段欺騙用戶的瀏覽器去訪問一個自己曾經認證過的網站並執行一些操作（如發郵件，發消息，甚至財產操作如轉帳和購買商品）。由於瀏覽器曾經認證過，所以被訪問的網站會認為是真正的用戶操作而去執行。這利用了 Web 中用戶身份驗證的一個漏洞：簡單的身份驗證只能保證請求發自某個用戶的瀏覽器，卻不能保證請求本身是用戶自願發出的。</p>
+<p>另外若是對於 OWASP Top 10 有任何的建議或疑問都可以到官方的 GitHub，上面也紀錄了歷年來的版本 - <a href="https://github.com/OWASP/Top10" title="https://github.com/OWASP/Top10" target="_blank" rel="noopener">https://github.com/OWASP/Top10</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/OWASP/" rel="tag"># OWASP</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/tech/GPS-NMEA/" rel="next" title="GPS 資料格式">
+                <i class="fa fa-chevron-left"></i> GPS 資料格式
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/tech/FFmpeg-introduction/" rel="prev" title="FFmpeg 多媒體框架">
+                FFmpeg 多媒體框架 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Tony Xu</p>
+  <div class="site-description motion-element" itemprop="description">希望藉由分享 & 紀錄，來讓自己的生活留下足跡，也希望藉由我的分享來幫助更多的人</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">30</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分類</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">69</span>
+        <span class="site-state-item-name">標籤</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/dexiang" title="GitHub &rarr; https://github.com/dexiang" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://www.linkedin.com/in/tony-xu/" title="Linkedin &rarr; https://www.linkedin.com/in/tony-xu/" rel="noopener" target="_blank"><i class="fa fa-fw fa-linkedin"></i>Linkedin</a>
+      </span>
+    
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Top-1-Injection"><span class="nav-number">1.</span> <span class="nav-text">Top 1: Injection</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Top-2-Broken-Authentication-and-Session-Management"><span class="nav-number">2.</span> <span class="nav-text">Top 2: Broken Authentication and Session Management</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Top-3-Sensitive-Data-Exposure"><span class="nav-number">3.</span> <span class="nav-text">Top 3: Sensitive Data Exposure</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Top-4-XML-External-Entity-XXE"><span class="nav-number">4.</span> <span class="nav-text">Top 4: XML External Entity(XXE)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Top-5-Broken-Access-Control"><span class="nav-number">5.</span> <span class="nav-text">Top 5: Broken Access Control</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Top-6-Security-Misconfiguration"><span class="nav-number">6.</span> <span class="nav-text">Top 6: Security Misconfiguration</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Top-7-Cross-Site-Scripting-XSS"><span class="nav-number">7.</span> <span class="nav-text">Top 7: Cross-Site Scripting(XSS)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Top-8-Insecure-Deserialization"><span class="nav-number">8.</span> <span class="nav-text">Top 8: Insecure Deserialization</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Top-9-Using-Components-with-Known-Vulnerabilities"><span class="nav-number">9.</span> <span class="nav-text">Top 9: Using Components with Known Vulnerabilities</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Top-10-Insufficient-Logging-amp-Monitoring"><span class="nav-number">10.</span> <span class="nav-text">Top 10: Insufficient Logging &amp; Monitoring</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#同場加映："><span class="nav-number">11.</span> <span class="nav-text">同場加映：</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tony Xu</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 強力驅動 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主題 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

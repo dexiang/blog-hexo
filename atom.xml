@@ -1,0 +1,586 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Tony 字傳</title>
+  
+  <subtitle>紀錄 &amp; 分享一切</subtitle>
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="https://blog.dexiang.me/"/>
+  <updated>2019-08-09T04:18:50.243Z</updated>
+  <id>https://blog.dexiang.me/</id>
+  
+  <author>
+    <name>Tony Xu</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>打造好用且美觀的 command line</title>
+    <link href="https://blog.dexiang.me/tech/prettify_your_mac_terminal/"/>
+    <id>https://blog.dexiang.me/tech/prettify_your_mac_terminal/</id>
+    <published>2018-05-20T09:35:45.000Z</published>
+    <updated>2019-08-09T04:18:50.243Z</updated>
+    
+    <summary type="html">
+    
+      &lt;img src=&quot;/tech/prettify_your_mac_terminal/pretty_terminal.png&quot; title=&quot;美化過的 Terminal&quot;&gt;
+
+&lt;p&gt;身為一個程式設計師，隨身有一個好用的 command line tool，也是很正常的～&lt;/p&gt;
+&lt;p&gt;我用的是 iterm2 + zsh + oh-my-zsh，這裡就不贅述是為什麼了（因為這組合太多人用了，網路上文章很多拉～），再修改一些設定和加上一些 plugin 來改造 command line 環境。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="tech" scheme="https://blog.dexiang.me/categories/tech/"/>
+    
+    
+      <category term="iTerm2" scheme="https://blog.dexiang.me/tags/iTerm2/"/>
+    
+      <category term="zsh" scheme="https://blog.dexiang.me/tags/zsh/"/>
+    
+      <category term="oh-my-zsh" scheme="https://blog.dexiang.me/tags/oh-my-zsh/"/>
+    
+      <category term="powerlevel9k" scheme="https://blog.dexiang.me/tags/powerlevel9k/"/>
+    
+      <category term="zsh-completions" scheme="https://blog.dexiang.me/tags/zsh-completions/"/>
+    
+      <category term="zsh-autosuggestions" scheme="https://blog.dexiang.me/tags/zsh-autosuggestions/"/>
+    
+      <category term="zsh-syntax-highlighting" scheme="https://blog.dexiang.me/tags/zsh-syntax-highlighting/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>X.509</title>
+    <link href="https://blog.dexiang.me/tech/x509/"/>
+    <id>https://blog.dexiang.me/tech/x509/</id>
+    <published>2018-05-15T09:45:35.000Z</published>
+    <updated>2019-08-09T04:18:50.254Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;延續上次簡介密碼學的時候有談到 PKI，今天要來看看 X.509 這個廣為使用的數位憑證標準。&lt;/p&gt;
+
+
+&lt;p&gt;先來複習一下名詞吧&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Symmetric Encryption：對稱加密，加解密用同一把鎖&lt;br&gt;Asymmetric Encryption：非對稱加密，用兩把鎖配合來加解密&lt;br&gt;Public Key：非對稱加密中可公開的鎖&lt;br&gt;Private Key：非對稱加密中的私鑰，絕對不可外流&lt;br&gt;Signature：數位簽章，通常是利用內容的 Hash 和 Private Key 所產生的，用來識別發送端身份&lt;br&gt;Man-in-the-middle attack：中間人攻擊指的是駭客利用攔截和偽裝公鑰交換來竄改和轉發訊息&lt;br&gt;PKI：公開金鑰基礎架構提供公鑰和證書的管理&lt;br&gt;CA：Certificate Authority，認證機構也就是憑證簽發的機構&lt;br&gt;Certificate：由 CA 所發的憑證，包含擁有者的資訊、CA、有效日期等訊息&lt;br&gt;CSR（Certificate Signing Request）：憑證簽發請求文件，要透過這份文件去跟 CA 申請憑證  &lt;/p&gt;
+&lt;/blockquote&gt;
+    
+    </summary>
+    
+      <category term="tech" scheme="https://blog.dexiang.me/categories/tech/"/>
+    
+    
+      <category term="PKI" scheme="https://blog.dexiang.me/tags/PKI/"/>
+    
+      <category term="X.509" scheme="https://blog.dexiang.me/tags/X-509/"/>
+    
+      <category term="CA" scheme="https://blog.dexiang.me/tags/CA/"/>
+    
+      <category term="certificate" scheme="https://blog.dexiang.me/tags/certificate/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>密碼學簡介</title>
+    <link href="https://blog.dexiang.me/tech/cryptography-introduction/"/>
+    <id>https://blog.dexiang.me/tech/cryptography-introduction/</id>
+    <published>2018-05-10T09:01:32.000Z</published>
+    <updated>2019-08-09T04:18:50.214Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;在傳遞資料的時候，若是不希望別人看到，那麼我們就會把內容做適當的處理。在現實生活中其實隨處可見密碼學的概念，我們就來想像以下的情境吧。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Tony 想傳情書給 Whitney，但不想給別人看到，他們會怎麼做呢？&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&quot;對稱加密（Symmetric-Encryption）&quot;&gt;&lt;a href=&quot;#對稱加密（Symmetric-Encryption）&quot; class=&quot;headerlink&quot; title=&quot;對稱加密（Symmetric Encryption）&quot;&gt;&lt;/a&gt;對稱加密（Symmetric Encryption）&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;一開始他們就把信交給郵差之前，將它裝到盒子裡上鎖，各拿一把鑰匙，透過郵差拿到盒子後再把鎖打開&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;對稱加密，溝通雙方拿著一樣的金鑰，有鑰匙的人就可以自由開關，而沒有鑰匙的人就算拿到保險箱也打不開，常見的有：DES、AES&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="tech" scheme="https://blog.dexiang.me/categories/tech/"/>
+    
+    
+      <category term="cryptography" scheme="https://blog.dexiang.me/tags/cryptography/"/>
+    
+      <category term="對稱加密" scheme="https://blog.dexiang.me/tags/%E5%B0%8D%E7%A8%B1%E5%8A%A0%E5%AF%86/"/>
+    
+      <category term="Symmetric Encryption" scheme="https://blog.dexiang.me/tags/Symmetric-Encryption/"/>
+    
+      <category term="非對稱加密" scheme="https://blog.dexiang.me/tags/%E9%9D%9E%E5%B0%8D%E7%A8%B1%E5%8A%A0%E5%AF%86/"/>
+    
+      <category term="Asymmetric encryption" scheme="https://blog.dexiang.me/tags/Asymmetric-encryption/"/>
+    
+      <category term="數位簽章" scheme="https://blog.dexiang.me/tags/%E6%95%B8%E4%BD%8D%E7%B0%BD%E7%AB%A0/"/>
+    
+      <category term="Signature" scheme="https://blog.dexiang.me/tags/Signature/"/>
+    
+      <category term="PKI" scheme="https://blog.dexiang.me/tags/PKI/"/>
+    
+      <category term="X.509" scheme="https://blog.dexiang.me/tags/X-509/"/>
+    
+      <category term="CA" scheme="https://blog.dexiang.me/tags/CA/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Golang JSON 處理</title>
+    <link href="https://blog.dexiang.me/tech/golang-json/"/>
+    <id>https://blog.dexiang.me/tech/golang-json/</id>
+    <published>2018-04-30T09:32:35.000Z</published>
+    <updated>2019-08-09T04:18:50.237Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;JSON（JavaScript Object Notation）是一種輕量級的資料交換語言，以純文字為基礎去儲存資料，有相容性高、易於理解且許多程式語言都支援等優點。&lt;/p&gt;
+&lt;p&gt;而在 Golang 之中是如何處理 JSON 的呢？&lt;/p&gt;
+&lt;img src=&quot;/tech/golang-json/go-json.png&quot; title=&quot;Go JSON&quot;&gt;
+
+&lt;p&gt;Golang 官方的 &lt;a href=&quot;https://golang.org/pkg/encoding/json/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;package&lt;/a&gt; 中已有支援 JSON，可很容易的對 JSON 數據做編解碼&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="tech" scheme="https://blog.dexiang.me/categories/tech/"/>
+    
+    
+      <category term="golang" scheme="https://blog.dexiang.me/tags/golang/"/>
+    
+      <category term="Go" scheme="https://blog.dexiang.me/tags/Go/"/>
+    
+      <category term="json" scheme="https://blog.dexiang.me/tags/json/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>GPS 簡介</title>
+    <link href="https://blog.dexiang.me/tech/GPS-introduction/"/>
+    <id>https://blog.dexiang.me/tech/GPS-introduction/</id>
+    <published>2018-04-23T05:07:35.000Z</published>
+    <updated>2019-08-09T04:18:50.190Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;GPS 英文全名是：Global Positioning System，全球定位系統&lt;/p&gt;
+&lt;p&gt;一般來說要表示地理位置都會用座標來標示，實際上用座標是不夠清楚的，因為所指的座標是用什麼基準的並沒有說明。明確的地理位置會用大地基準（Datum）＋坐標格式（Format／Grid）兩個參數來標示。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="tech" scheme="https://blog.dexiang.me/categories/tech/"/>
+    
+    
+      <category term="GPS" scheme="https://blog.dexiang.me/tags/GPS/"/>
+    
+      <category term="Datum" scheme="https://blog.dexiang.me/tags/Datum/"/>
+    
+      <category term="TWD67" scheme="https://blog.dexiang.me/tags/TWD67/"/>
+    
+      <category term="TWD97" scheme="https://blog.dexiang.me/tags/TWD97/"/>
+    
+      <category term="WGS84" scheme="https://blog.dexiang.me/tags/WGS84/"/>
+    
+      <category term="Haversine" scheme="https://blog.dexiang.me/tags/Haversine/"/>
+    
+      <category term="Vincenty" scheme="https://blog.dexiang.me/tags/Vincenty/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>File Locking</title>
+    <link href="https://blog.dexiang.me/tech/File-Locking/"/>
+    <id>https://blog.dexiang.me/tech/File-Locking/</id>
+    <published>2018-02-09T12:20:39.000Z</published>
+    <updated>2019-08-09T04:18:50.177Z</updated>
+    
+    <summary type="html">
+    
+      &lt;img src=&quot;/tech/File-Locking/file-system.jpeg&quot; title=&quot;File System&quot;&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;再動手寫這篇之前，我踩到了一個雷，這篇描述了一下我遇到的問題跟解法，若是有人有更好的想法，或是我哪裡有搞錯了，請告訴我，我會非常感謝的！！！&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&quot;遇到問題&quot;&gt;&lt;a href=&quot;#遇到問題&quot; class=&quot;headerlink&quot; title=&quot;遇到問題&quot;&gt;&lt;/a&gt;遇到問題&lt;/h2&gt;&lt;p&gt;用 Golang 寫了一隻利用 goroutine 去做事的程式，並放在 AWS EC2 spot fleet 去做 auto scale，其中每台 EC2 instances 上掛載了 EFS 把 Log 寫在內，運行了以後發現 Log 不完整，會有字串被截斷或消失的狀況。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="tech" scheme="https://blog.dexiang.me/categories/tech/"/>
+    
+    
+      <category term="PHP" scheme="https://blog.dexiang.me/tags/PHP/"/>
+    
+      <category term="Linux" scheme="https://blog.dexiang.me/tags/Linux/"/>
+    
+      <category term="Golang" scheme="https://blog.dexiang.me/tags/Golang/"/>
+    
+      <category term="lock" scheme="https://blog.dexiang.me/tags/lock/"/>
+    
+      <category term="flock" scheme="https://blog.dexiang.me/tags/flock/"/>
+    
+      <category term="fcntl" scheme="https://blog.dexiang.me/tags/fcntl/"/>
+    
+      <category term="EFS" scheme="https://blog.dexiang.me/tags/EFS/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>HTTP Caching</title>
+    <link href="https://blog.dexiang.me/tech/HTTP-Caching/"/>
+    <id>https://blog.dexiang.me/tech/HTTP-Caching/</id>
+    <published>2018-02-01T07:02:39.000Z</published>
+    <updated>2019-08-09T04:18:50.192Z</updated>
+    
+    <summary type="html">
+    
+      &lt;img src=&quot;/tech/HTTP-Caching/Web-browsers-Chrome-Firefox-Safari-Edge-Opera_640x241.png&quot; title=&quot;Browsers&quot;&gt;
+
+&lt;p&gt;近年來 Web 的服務越來越多樣化，其中不乏較大流量的服務，不僅增加傳輸的成本，也會拖慢 Browser 處理的時間，因此需要重複的利用之前所緩存的資源。&lt;/p&gt;
+&lt;h2 id=&quot;Caching-機制&quot;&gt;&lt;a href=&quot;#Caching-機制&quot; class=&quot;headerlink&quot; title=&quot;Caching 機制&quot;&gt;&lt;/a&gt;Caching 機制&lt;/h2&gt;&lt;p&gt;那就讓我們來看看 Caching 的機制是什麼&lt;/p&gt;
+&lt;p&gt;在規範（&lt;a href=&quot;https://tools.ietf.org/html/rfc7234&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;https://tools.ietf.org/html/rfc7234&lt;/a&gt;）中將其分為 4.2. Freshness 和 4.3. Validation &lt;/p&gt;
+    
+    </summary>
+    
+      <category term="tech" scheme="https://blog.dexiang.me/categories/tech/"/>
+    
+    
+      <category term="HTTP" scheme="https://blog.dexiang.me/tags/HTTP/"/>
+    
+      <category term="Cache" scheme="https://blog.dexiang.me/tags/Cache/"/>
+    
+      <category term="Cache-Control" scheme="https://blog.dexiang.me/tags/Cache-Control/"/>
+    
+      <category term="ETage" scheme="https://blog.dexiang.me/tags/ETage/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Go 介紹</title>
+    <link href="https://blog.dexiang.me/tech/go-introduction/"/>
+    <id>https://blog.dexiang.me/tech/go-introduction/</id>
+    <published>2018-01-29T02:08:52.000Z</published>
+    <updated>2019-08-09T04:18:50.223Z</updated>
+    
+    <summary type="html">
+    
+      &lt;img src=&quot;/tech/go-introduction/go-logo.png&quot; title=&quot;Golang&quot;&gt;
+
+&lt;p&gt;在一年多以前，開始在社群跟朋友間很常聽到 &lt;code&gt;Go&lt;/code&gt; 這個程式語言，也很好奇為什麼它突然聲名大噪，為什麼這麼多人推崇，在做了一些功課以後，近期有個機會可以將 &lt;code&gt;Go&lt;/code&gt; 用在實際的專案上，就來稍微的敘述一下心得好了。&lt;/p&gt;
+&lt;h2 id=&quot;背景-amp-理念&quot;&gt;&lt;a href=&quot;#背景-amp-理念&quot; class=&quot;headerlink&quot; title=&quot;背景 &amp;amp; 理念&quot;&gt;&lt;/a&gt;背景 &amp;amp; 理念&lt;/h2&gt;&lt;p&gt;Google 開發的一種靜態強型別、編譯型、併發型，並具有垃圾回收功能的開源程式語言，於 2009 年面世，也稱作 Golang。由 Rob Pike &amp;amp; Robert Griesemer &amp;amp; Ken Thompson 共同開發，在短短不到十年的時間已在程式排名中有一席之地了，像是獲選 &lt;a href=&quot;https://www.tiobe.com/tiobe-index/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;TIOBE&lt;/a&gt; 的 2016 最佳語言&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="tech" scheme="https://blog.dexiang.me/categories/tech/"/>
+    
+    
+      <category term="go" scheme="https://blog.dexiang.me/tags/go/"/>
+    
+      <category term="golang" scheme="https://blog.dexiang.me/tags/golang/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>多媒體基本概念</title>
+    <link href="https://blog.dexiang.me/tech/Media-basic-concept/"/>
+    <id>https://blog.dexiang.me/tech/Media-basic-concept/</id>
+    <published>2017-12-29T12:04:58.000Z</published>
+    <updated>2019-08-09T04:18:50.195Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;接續著上次的簡介及流程介紹，這次就來聊聊常用到的選項（還偷渡了一點我會用到的 XDD）&lt;/p&gt;
+&lt;p&gt;一開始我們先來確認 FFmpeg 的版本 ＆ 內含 Library，這關係到我們能用的功能，好比說我想轉 H.264 的 Codec，那麼我就要先確認我有沒有 &lt;code&gt;libx264&lt;/code&gt; 這個函式庫&lt;/p&gt;
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;$ ffmpeg -version&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+    
+    </summary>
+    
+      <category term="tech" scheme="https://blog.dexiang.me/categories/tech/"/>
+    
+    
+      <category term="FFmpeg" scheme="https://blog.dexiang.me/tags/FFmpeg/"/>
+    
+      <category term="streaming" scheme="https://blog.dexiang.me/tags/streaming/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>FFmpeg H.264 編碼器</title>
+    <link href="https://blog.dexiang.me/tech/FFmpeg-H264-Options/"/>
+    <id>https://blog.dexiang.me/tech/FFmpeg-H264-Options/</id>
+    <published>2017-12-23T15:44:58.000Z</published>
+    <updated>2019-08-09T04:18:50.175Z</updated>
+    
+    <summary type="html">
+    
+      &lt;img src=&quot;/tech/FFmpeg-H264-Options/h264.png&quot; title=&quot;H264&quot;&gt;
+
+&lt;p&gt;H.264 / MPEG-4 AVC 是目前最被廣泛被應用的視訊編碼格式，它的壓縮效率比 MPEG-2、MPEG-4、RV40 …等舊視訊編碼格式還要高許多。&lt;/p&gt;
+&lt;p&gt;如果要輸出 H.264 / AVC 視訊編碼，則需要 &lt;code&gt;libx264&lt;/code&gt; 編碼器，FFmpeg 的組態設定之中必須有 &lt;code&gt;--enable-libx264&lt;/code&gt; 則才可以使用。&lt;/p&gt;
+&lt;p&gt;H.264 有多個版本，版本越高壓縮比就越高（對應到 profile）&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="tech" scheme="https://blog.dexiang.me/categories/tech/"/>
+    
+    
+      <category term="FFmpeg" scheme="https://blog.dexiang.me/tags/FFmpeg/"/>
+    
+      <category term="H264" scheme="https://blog.dexiang.me/tags/H264/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>FFmpeg 常用選項</title>
+    <link href="https://blog.dexiang.me/tech/FFmpeg-Common-Options/"/>
+    <id>https://blog.dexiang.me/tech/FFmpeg-Common-Options/</id>
+    <published>2017-12-22T09:04:38.000Z</published>
+    <updated>2019-08-09T04:18:50.175Z</updated>
+    
+    <summary type="html">
+    
+      &lt;img src=&quot;/tech/FFmpeg-Common-Options/transcoder.png&quot; title=&quot;Transcoder&quot;&gt;
+
+&lt;p&gt;接續著上次的簡介及流程介紹，這次就來聊聊常用到的選項（還偷渡了一點我會用到的 XDD）&lt;/p&gt;
+&lt;p&gt;一開始我們先來確認 FFmpeg 的版本 ＆ 內含 Library，這關係到我們能用的功能，好比說我想轉 H.264 的 Codec，那麼我就要先確認我有沒有 &lt;code&gt;libx264&lt;/code&gt; 這個函式庫&lt;/p&gt;
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;$ ffmpeg -version&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+    
+    </summary>
+    
+      <category term="tech" scheme="https://blog.dexiang.me/categories/tech/"/>
+    
+    
+      <category term="FFmpeg" scheme="https://blog.dexiang.me/tags/FFmpeg/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>FFmpeg 多媒體框架</title>
+    <link href="https://blog.dexiang.me/tech/FFmpeg-introduction/"/>
+    <id>https://blog.dexiang.me/tech/FFmpeg-introduction/</id>
+    <published>2017-12-20T09:04:38.000Z</published>
+    <updated>2019-08-09T04:18:50.176Z</updated>
+    
+    <summary type="html">
+    
+      &lt;img src=&quot;/tech/FFmpeg-introduction/ffmpeg.png&quot; title=&quot;FFmpeg&quot;&gt;
+
+&lt;p&gt;FFmpeg 為開源的影音處理框架，可幫助我們進行影音的格式轉換、分離、混合、過濾等等，&lt;a href=&quot;http://ffmpeg.org/general.html#Supported-File-Formats_002c-Codecs-or-Features&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;支援格式&lt;/a&gt; 也非常的廣泛，也可以在多個作業系統及硬體架構上運作。同時也支援多種函式庫，更增加使用上的彈性，依照需求建立出最適合的工具。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="tech" scheme="https://blog.dexiang.me/categories/tech/"/>
+    
+    
+      <category term="FFmpeg" scheme="https://blog.dexiang.me/tags/FFmpeg/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>OWASP Top 10 2017</title>
+    <link href="https://blog.dexiang.me/tech/OWASP-2017/"/>
+    <id>https://blog.dexiang.me/tech/OWASP-2017/</id>
+    <published>2017-11-21T08:04:35.000Z</published>
+    <updated>2019-08-09T04:18:50.199Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;這禮拜一去參加了 OWASP 2017 的研討會，其中提到了新發佈的 OWASP Top 10 2017版；先回頭來談一下什麼是 OWASP，在開發系統時，除了功能以外，安全也是必須要著重且注意的，在快速開發的過程中，常常會沒有兼顧到安全這塊；對於部分各戶來說，在還未出包之前大概也不會感覺到資安的重要；OWASP 就統整了十大弱點排名（當然啦～不是只有這十個需要重視）， 最近的一次正式更新是在 2013 年，在這過程中資訊的進步很快，排名也略有變動。&lt;/p&gt;
+&lt;img src=&quot;/tech/OWASP-2017/OWASP_Top_10_2013_with_2017_800x446.png&quot; title=&quot;OWASP Top 10&quot;&gt;
+
+&lt;p&gt;在研討會中也提到了最新的 OWASP Top 10 2017，與 2013 年比較第一名依舊是 Injection，第二名是身份驗證；然而新版的因考慮了現在的系統採用了許多的 API 讓前後端分離，也搜集了實際企業的 Log 數據，可以從排名中看出都跟最近流行的微服務有關。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="tech" scheme="https://blog.dexiang.me/categories/tech/"/>
+    
+    
+      <category term="OWASP" scheme="https://blog.dexiang.me/tags/OWASP/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>GPS 資料格式</title>
+    <link href="https://blog.dexiang.me/tech/GPS-NMEA/"/>
+    <id>https://blog.dexiang.me/tech/GPS-NMEA/</id>
+    <published>2017-11-02T02:07:32.000Z</published>
+    <updated>2019-08-09T04:18:50.180Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;什麼是 NMEA file ？&lt;br&gt;美國國家海洋電子協會 (National Marine Electronics Association，NMEA) 制定了 GPS 協定標準規格，NMEA 0183 的資料格式中記錄了座標、方位、速度、衛星有效數量等等的資訊。&lt;/p&gt;
+&lt;img src=&quot;/tech/GPS-NMEA/GPS_600.jpg&quot; title=&quot;GPS&quot;&gt;
+    
+    </summary>
+    
+      <category term="tech" scheme="https://blog.dexiang.me/categories/tech/"/>
+    
+    
+      <category term="GPS" scheme="https://blog.dexiang.me/tags/GPS/"/>
+    
+      <category term="NMEA" scheme="https://blog.dexiang.me/tags/NMEA/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>淺談 SEO</title>
+    <link href="https://blog.dexiang.me/tech/SEO-basic/"/>
+    <id>https://blog.dexiang.me/tech/SEO-basic/</id>
+    <published>2017-10-20T08:04:35.000Z</published>
+    <updated>2019-08-09T04:18:50.207Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;SEO 是什麼呢？它的全稱是 Search Engine Optimization（搜尋引擎優化）。&lt;/p&gt;
+&lt;img src=&quot;/tech/SEO-basic/seo-860x484.png&quot; title=&quot;SEO&quot;&gt;
+
+&lt;p&gt;要如何優化呢？其實就是想辦法讓各家的搜尋引擎看懂你的網站；當然內容正確是基本的，搜尋引擎就像一個圖書館一樣，當書目很大量時就得依靠索引、關鍵字等等的輔助去找到書籍，依照大綱、標題等等的去找到正確的內容。再來就是要針對各家的演算法去做強化，但不建議過度針對演算法優化，把內容做好＆標籤打對才是基本功。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="tech" scheme="https://blog.dexiang.me/categories/tech/"/>
+    
+    
+      <category term="SEO" scheme="https://blog.dexiang.me/tags/SEO/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>CloudFlare 代管 GoDaddy DNS</title>
+    <link href="https://blog.dexiang.me/tech/godaddy-to-cloudflare/"/>
+    <id>https://blog.dexiang.me/tech/godaddy-to-cloudflare/</id>
+    <published>2017-08-20T07:04:30.000Z</published>
+    <updated>2019-08-09T04:18:50.226Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;前一陣子把 GoDaddy 所購買的 Domain 搬到 CloudFlare 代管，主要是看上免費的 CDN 和 SSL，設定上也很方便&lt;/p&gt;
+&lt;h2 id=&quot;新增站台&quot;&gt;&lt;a href=&quot;#新增站台&quot; class=&quot;headerlink&quot; title=&quot;新增站台&quot;&gt;&lt;/a&gt;新增站台&lt;/h2&gt;&lt;p&gt;註冊後，點選畫面的右上角「Add Site」來新增站台吧&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="tech" scheme="https://blog.dexiang.me/categories/tech/"/>
+    
+    
+      <category term="CDN" scheme="https://blog.dexiang.me/tags/CDN/"/>
+    
+      <category term="SSL" scheme="https://blog.dexiang.me/tags/SSL/"/>
+    
+      <category term="GoDaddy" scheme="https://blog.dexiang.me/tags/GoDaddy/"/>
+    
+      <category term="CloudFlare" scheme="https://blog.dexiang.me/tags/CloudFlare/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>重新安裝 macOS</title>
+    <link href="https://blog.dexiang.me/tech/reinstall-macOS/"/>
+    <id>https://blog.dexiang.me/tech/reinstall-macOS/</id>
+    <published>2017-08-15T07:04:30.000Z</published>
+    <updated>2019-08-09T04:18:50.248Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;最近換了新的工作，因舊的 mac 已不敷使用，只好將它脫手買一台最新最潮的 MacBook Pro 了 (不知道是該難過還是高興…)&lt;/p&gt;
+&lt;p&gt;回到正題，其實 Mac 不太需要重灌，舊的 MacBook Air 也用了好幾年，這中間也都沒有重灌過，不過若是像我一樣是想要賣人，那當然要清乾淨了 ( &lt;del&gt;免得不小心流出什麼&lt;/del&gt; )&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="tech" scheme="https://blog.dexiang.me/categories/tech/"/>
+    
+    
+      <category term="mac" scheme="https://blog.dexiang.me/tags/mac/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>CentOS 7 上安裝與設定 Nginx + PHP7</title>
+    <link href="https://blog.dexiang.me/tech/GCP/nginx-with-php7/"/>
+    <id>https://blog.dexiang.me/tech/GCP/nginx-with-php7/</id>
+    <published>2017-06-22T11:18:20.000Z</published>
+    <updated>2017-08-22T08:18:20.000Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;之前在工作上幾乎都是採用 Apache，前一陣子常聽到同事說 Nginx，但我卻沒有實際用過，趁這這次試用 GCP，也來試試看 Nginx&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;注：以下的環境是在 GCE (Google Compute Engine) + CentOS7 上完成。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&quot;安裝-Nginx&quot;&gt;&lt;a href=&quot;#安裝-Nginx&quot; class=&quot;headerlink&quot; title=&quot;安裝 Nginx&quot;&gt;&lt;/a&gt;安裝 Nginx&lt;/h2&gt;&lt;p&gt;要在 yum 中增加 Nginx，需手動加入 repo 設定，這樣就可以透過 yum 安裝了&lt;/p&gt;
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;# 讓 yum 能找到 nginx&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;$ vim /etc/yum.repos.d/nginx.repo&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+    
+    </summary>
+    
+      <category term="tech" scheme="https://blog.dexiang.me/categories/tech/"/>
+    
+      <category term="GCP" scheme="https://blog.dexiang.me/categories/tech/GCP/"/>
+    
+    
+      <category term="MacOSX" scheme="https://blog.dexiang.me/tags/MacOSX/"/>
+    
+      <category term="git" scheme="https://blog.dexiang.me/tags/git/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>開始動手做吧～ 在 GCP 上建立自己的虛擬主機</title>
+    <link href="https://blog.dexiang.me/tech/start-gcp-and-gce/"/>
+    <id>https://blog.dexiang.me/tech/start-gcp-and-gce/</id>
+    <published>2017-06-19T08:04:30.000Z</published>
+    <updated>2019-08-09T04:18:50.251Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;最近申請了 GCP 上的帳號，首年免費試用，且送 300 美金，立馬開一台來玩玩啊。上面也有免費的機器可以使用，在盤算著是否可以把 AWS 上一些小的測試服務搬過來。&lt;/p&gt;
+&lt;h2 id=&quot;GCP-試用服務&quot;&gt;&lt;a href=&quot;#GCP-試用服務&quot; class=&quot;headerlink&quot; title=&quot;GCP 試用服務&quot;&gt;&lt;/a&gt;GCP 試用服務&lt;/h2&gt;&lt;p&gt;第一年免費獲得 $300 美元的試用額度，當 12 個月後或用完 $300 美元試用額度後結束試用，若是沒有用完，這筆金額將在 12 個月後作廢。Google Cloud Platform 主控台頂端會顯示剩餘的試用額度和天數。&lt;/p&gt;
+&lt;h2 id=&quot;GCP-永久免費服務&quot;&gt;&lt;a href=&quot;#GCP-永久免費服務&quot; class=&quot;headerlink&quot; title=&quot;GCP 永久免費服務&quot;&gt;&lt;/a&gt;GCP 永久免費服務&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;Google Compute Engine&lt;ul&gt;
+&lt;li&gt;每個月 1 台 f1-micro VM (限定 US regions，除 Northern Virginia：us-central1、us-west1、us-east1)&lt;/li&gt;
+&lt;li&gt;每個月 30 GB 硬碟 &amp;amp; 5 GB 快照&lt;/li&gt;
+&lt;li&gt;每個月 1 GB 的網路出口流量 (除了中國和澳洲)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+    
+    </summary>
+    
+      <category term="tech" scheme="https://blog.dexiang.me/categories/tech/"/>
+    
+    
+      <category term="GCP" scheme="https://blog.dexiang.me/tags/GCP/"/>
+    
+      <category term="GCE" scheme="https://blog.dexiang.me/tags/GCE/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>刪除 .DS_Store 隱藏檔</title>
+    <link href="https://blog.dexiang.me/tech/remove-ds-store/"/>
+    <id>https://blog.dexiang.me/tech/remove-ds-store/</id>
+    <published>2017-06-17T08:50:20.000Z</published>
+    <updated>2019-08-09T04:18:50.251Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;最近新買了一台 NAS，在連線的時候常常會發現多了 .DS_Store 這個隱藏檔，平常在 Mac 上倒是無所謂，但是出現在 NAS 裡就覺得煩人了&lt;/p&gt;
+&lt;h2 id=&quot;DS-Store&quot;&gt;&lt;a href=&quot;#DS-Store&quot; class=&quot;headerlink&quot;
+        
+      
+    
+    </summary>
+    
+      <category term="tech" scheme="https://blog.dexiang.me/categories/tech/"/>
+    
+    
+      <category term="MacOSX" scheme="https://blog.dexiang.me/tags/MacOSX/"/>
+    
+      <category term="git" scheme="https://blog.dexiang.me/tags/git/"/>
+    
+  </entry>
+  
+</feed>

@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next muse use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '複製',
+      copy_success: '複製成功',
+      copy_failure: '複製失敗'
+    }
+  };
+</script>
+
+  <meta name="description" content="H.264 / MPEG-4 AVC 是目前最被廣泛被應用的視訊編碼格式，它的壓縮效率比 MPEG-2、MPEG-4、RV40 …等舊視訊編碼格式還要高許多。 如果要輸出 H.264 / AVC 視訊編碼，則需要 libx264 編碼器，FFmpeg 的組態設定之中必須有 --enable-libx264 則才可以使用。 H.264 有多個版本，版本越高壓縮比就越高（對應到 profile）">
+<meta name="keywords" content="FFmpeg,H264">
+<meta property="og:type" content="article">
+<meta property="og:title" content="FFmpeg H.264 編碼器">
+<meta property="og:url" content="https://blog.dexiang.me/tech/FFmpeg-H264-Options/index.html">
+<meta property="og:site_name" content="Tony 字傳">
+<meta property="og:description" content="H.264 / MPEG-4 AVC 是目前最被廣泛被應用的視訊編碼格式，它的壓縮效率比 MPEG-2、MPEG-4、RV40 …等舊視訊編碼格式還要高許多。 如果要輸出 H.264 / AVC 視訊編碼，則需要 libx264 編碼器，FFmpeg 的組態設定之中必須有 --enable-libx264 則才可以使用。 H.264 有多個版本，版本越高壓縮比就越高（對應到 profile）">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:image" content="https://blog.dexiang.me/tech/FFmpeg-H264-Options/h264.png">
+<meta property="og:updated_time" content="2019-08-09T04:18:50.175Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="FFmpeg H.264 編碼器">
+<meta name="twitter:description" content="H.264 / MPEG-4 AVC 是目前最被廣泛被應用的視訊編碼格式，它的壓縮效率比 MPEG-2、MPEG-4、RV40 …等舊視訊編碼格式還要高許多。 如果要輸出 H.264 / AVC 視訊編碼，則需要 libx264 編碼器，FFmpeg 的組態設定之中必須有 --enable-libx264 則才可以使用。 H.264 有多個版本，版本越高壓縮比就越高（對應到 profile）">
+<meta name="twitter:image" content="https://blog.dexiang.me/tech/FFmpeg-H264-Options/h264.png">
+  <link rel="alternate" href="/atom.xml" title="Tony 字傳" type="application/atom+xml">
+  <link rel="canonical" href="https://blog.dexiang.me/tech/FFmpeg-H264-Options/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>FFmpeg H.264 編碼器 | Tony 字傳</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Tony 字傳</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">紀錄 & 分享一切</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首頁</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-technology">
+      
+    
+
+    <a href="/categories/tech/" rel="section"><i class="menu-item-icon fa fa-fw fa-code"></i> <br>科技</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>標籤</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>歸檔</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜尋</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜尋..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.dexiang.me/tech/FFmpeg-H264-Options/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Tony Xu">
+      <meta itemprop="description" content="希望藉由分享 & 紀錄，來讓自己的生活留下足跡，也希望藉由我的分享來幫助更多的人">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tony 字傳">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">FFmpeg H.264 編碼器
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2017-12-23 23:44:58" itemprop="dateCreated datePublished" datetime="2017-12-23T23:44:58+08:00">2017-12-23</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2019-08-09 12:18:50" itemprop="dateModified" datetime="2019-08-09T12:18:50+08:00">2019-08-09</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/tech/" itemprop="url" rel="index"><span itemprop="name">tech</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          <br>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <img src="/tech/FFmpeg-H264-Options/h264.png" title="H264">
+
+<p>H.264 / MPEG-4 AVC 是目前最被廣泛被應用的視訊編碼格式，它的壓縮效率比 MPEG-2、MPEG-4、RV40 …等舊視訊編碼格式還要高許多。</p>
+<p>如果要輸出 H.264 / AVC 視訊編碼，則需要 <code>libx264</code> 編碼器，FFmpeg 的組態設定之中必須有 <code>--enable-libx264</code> 則才可以使用。</p>
+<p>H.264 有多個版本，版本越高壓縮比就越高（對應到 profile）</p>
+<a id="more"></a>
+
+
+<h2 id="碼率控制（Rate-control）"><a href="#碼率控制（Rate-control）" class="headerlink" title="碼率控制（Rate control）"></a>碼率控制（Rate control）</h2><p>Rate control 是指控制 <code>每個畫格用了多少個位元</code> 的方法，這將影響檔案大小和品質分布。這裡就先不探討 Rate control 的種類有哪些。<br>通常會用下列兩種模式： Constant Rate Factor (CRF)、Two-Pass ABR，若沒有控制輸出大小的需求則使用 CRF 即可</p>
+<h3 id="Constant-Rate-Factor（CRF）"><a href="#Constant-Rate-Factor（CRF）" class="headerlink" title="Constant Rate Factor（CRF）"></a>Constant Rate Factor（CRF）</h3><p>固定品質指標，而不在意大小；CRF 會得到最佳的 bitrate 分配結果，缺點是你不能直接指定一個目標 bitrate 或是檔案大小。<br>設定值範圍為 0 – 51（可能會依照編譯版本而不同），0 為最高品質，預設值為 23，建議的範圍在 18 - 28，17 或 18 接近視覺無損，但在技術上來說並不是無損。</p>
+<h3 id="Two-Pass-ABR（Average-Bitrate）"><a href="#Two-Pass-ABR（Average-Bitrate）" class="headerlink" title="Two-Pass ABR（Average Bitrate）"></a>Two-Pass ABR（Average Bitrate）</h3><p>以平均值來說 ABR 與 CBR 相同，但 ABR 允許在 “適當” 的時候使用更好的 bitrate 以取得更好的畫質，但 ABR 是用動態補償的方式來計算畫面的複雜度，也就是說在影片的起始及開頭，或是當畫面不如預期變化的時候則可能會影響到產出。<br>所以在 two-pass 的時候，第一次轉檔時會先分析紀錄影片的內容，第二次再依照分析的結果加以轉碼，但相對的就是非常耗時，要是沒有輸出大小的需求，則用 CRF 即可。</p>
+<h2 id="Preset"><a href="#Preset" class="headerlink" title="Preset"></a>Preset</h2><p>為選項集合，用來設定編碼速度，相對的也會影響到壓縮比；編碼越快則壓縮比越低。<br>一速度遞減排序為：<code>ultrafast</code>、<code>superfast</code>、<code>veryfast</code>、<code>faster</code>、<code>fast</code>、<code>medium</code>（預設）、<code>slow</code>、<code>slower</code>、<code>veryslow</code>、 <del>placebo</del></p>
+<h2 id="Tune-選項"><a href="#Tune-選項" class="headerlink" title="Tune 選項"></a>Tune 選項</h2><p>也是為一個集合選項，可針對特定的影片類型微調參數設定值，以獲得更好的品質或壓縮率</p>
+<ul>
+<li>Film：<code>film</code>，用於高解析度電影，降低 deblocking</li>
+<li>Animation：<code>animation</code>，動畫＆卡通，使用 deblocking 和較多的 reference frames</li>
+<li>Grain：<code>grain</code>，保留舊影片的顆粒感</li>
+<li>Still Image：<code>stillimage</code>，幻燈片效果的影片</li>
+<li>Fast Decode：<code>fastdecode</code>，啟用部分禁用的 filter 來加速編碼</li>
+<li>Zero Latency：<code>zerolatency</code>，快速編碼＆低延遲</li>
+<li>PSNR：<code>psnr</code>，優化 PSNR </li>
+<li>SSIM：<code>ssim</code>，優化 SSIM </li>
+</ul>
+<h2 id="Profile"><a href="#Profile" class="headerlink" title="Profile"></a>Profile</h2><p>複合選項，Profile 越好壓縮比也越高，但編碼複雜度相對提升；越好的 Profile 相對啟用的功能也越多，所以對播放硬體的需求也較高</p>
+<!--<table>
+    <tr>
+        <th colspan="4"> Profiles </th>
+    </tr>
+    <tr>
+        <td></td>
+        <td> baseline </td>
+        <td> main </td>
+        <td> high </td>
+    </tr>
+    <tr>
+        <td>no-8x8dct</td>
+        <td>1</td>
+        <td>1</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td> bframes </td>
+        <td>0</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>no-cabac</td>
+        <td>1</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td> cqm </td>
+        <td>flat</td>
+        <td>flat</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td> weightp </td>
+        <td>0</td>
+        <td></td>
+        <td></td>
+    </tr>
+</table>-->
+
+<table><tr><th colspan="4"> Profiles </th></tr><tr><td></td><td> baseline </td><td> main </td><td> high </td></tr><tr><td>no-8x8dct</td><td>1</td><td>1</td><td></td></tr><tr><td> bframes </td><td>0</td><td></td><td></td></tr><tr><td>no-cabac</td><td>1</td><td></td><td></td></tr><tr><td> cqm </td><td>flat</td><td>flat</td><td></td></tr><tr><td> weightp </td><td>0</td><td></td><td></td></tr></table>
+
+
+<h2 id="Level"><a href="#Level" class="headerlink" title="Level"></a>Level</h2><p>複合選項，與解碼器的效能及容量對應，Level 越高需求越高</p>
+<!--<table>
+    <tr>
+        <th colspan="6"> Level </th>
+    </tr>
+    <tr>
+        <td></td>
+        <td>MaxMBPS(MB/s)</td>
+        <td>MaxFS(MBs)</td>
+        <td>MaxDpbMbs(MBs)</td>
+        <td>MaxBR(kbit/s)(Baseline,Main Profiles)</td>
+        <td>Examples for high resolution@ highest frame rate</td>
+    </tr>
+    <tr>
+        <td>3.0</td>
+        <td>40,500</td>
+        <td>1,620</td>
+        <td>8,1000</td>
+        <td>10,000</td>
+        <td>
+            176×144@172
+            352×240@120
+            352×480@60
+            720×480@30
+            720×576@25
+        </td>
+    </tr>
+    <tr>
+        <td>3.1</td>
+        <td>108,000</td>
+        <td>2,600</td>
+        <td>18,000</td>
+        <td>14,000</td>
+        <td>
+            352x288@172
+            352x576@130
+            640x480@90
+            720×576@60
+            1,280×720@30
+        </td>
+    </tr>
+    <tr>
+        <td>4.0</td>
+        <td>245,760</td>
+        <td>8,192</td>
+        <td>32.768</td>
+        <td>20,000</td>
+        <td>
+            720x480@172
+            720x576@150
+            1,280×720@60
+            2,048×1,024@30
+        </td>
+    </tr>
+    <tr>
+        <td>4.1</td>
+        <td>245,760</td>
+        <td>8,192</td>
+        <td>32,768</td>
+        <td>50,000</td>
+        <td>
+            720x480@172
+            720x576@150
+            1,280×720@60
+            2,048×1,024@30
+        </td>
+    </tr>
+    <tr>
+        <td>4.2</td>
+        <td>522,240</td>
+        <td>8,704</td>
+        <td>34,816</td>
+        <td>50,000</td>
+        <td>
+            720x576@172
+            1,280×720@140
+            2,048×1,080@60
+        </td>
+    </tr>
+</table>
+-->
+
+<table><tr><th colspan="6"> Level </th></tr><tr><td></td><td>MaxMBPS(MB/s)</td><td>MaxFS(MBs)</td><td>MaxDpbMbs(MBs)</td><td>MaxBR(kbit/s)(Baseline,Main Profiles)</td><td>Examples for high resolution@ highest frame rate</td></tr><tr><td>3.0</td><td>40,500</td><td>1,620</td><td>8,1000</td><td>10,000</td><td>
+            176×144@172
+            352×240@120
+            352×480@60
+            720×480@30
+            720×576@25</td></tr><tr><td>3.1</td><td>108,000</td><td>2,600</td><td>18,000</td><td>14,000</td><td>
+            352x288@172
+            352x576@130
+            640x480@90
+            720×576@60
+            1,280×720@30</td></tr><tr><td>4.0</td><td>245,760</td><td>8,192</td><td>32.768</td><td>20,000</td><td>
+            720x480@172
+            720x576@150
+            1,280×720@60
+            2,048×1,024@30
+        </td></tr><tr><td>4.1</td><td>245,760</td><td>8,192</td><td>32,768</td><td>50,000</td><td>
+            720x480@172
+            720x576@150
+            1,280×720@60
+            2,048×1,024@30</td></tr><tr><td>4.2</td><td>522,240</td><td>8,704</td><td>34,816</td><td>50,000</td><td>
+            720x576@172
+            1,280×720@140
+            2,048×1,080@60</td></tr></table>
+
+
+<h3 id="Decoded-picture-buffering"><a href="#Decoded-picture-buffering" class="headerlink" title="Decoded picture buffering"></a>Decoded picture buffering</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">capacity = min(floor(MaxDpbMbs / (PicWidthInMbs * FrameHeightInMbs)), 16)</span><br></pre></td></tr></table></figure>
+
+<!-- 因 Bug 顧先手動縮排
+<table>
+    <tr>
+        <td>Level</td>
+        <td>3.0</td>
+        <td>3.1</td>
+        <td>4.0</td>
+        <td>4.1</td>
+        <td>4.2</td>
+    </tr>
+    <tr>
+        <td>MaxDpbMbs</td>
+        <td>8,100</td>
+        <td>18,000</td>
+        <td>32,768</td>
+        <td>32,768</td>
+        <td>34,816</td>
+    </tr>
+</table>
+-->
+
+<table><tr><td>Level</td><td>3.0</td><td>3.1</td><td>4.0</td><td>4.1</td><td>4.2</td></tr><tr><td>MaxDpbMbs</td><td>8,100</td><td>18,000</td><td>32,768</td><td>32,768</td><td>34,816</td></tr></table>
+
+<h2 id="自定義"><a href="#自定義" class="headerlink" title="自定義"></a>自定義</h2><p>以上說的都是複合指令，若是有需求也可利用 -x264-params 做個別設定</p>
+<p>可參考：<br><a href="https://ffmpeg.org/ffmpeg-codecs.html#libx264_002c-libx264rgb" target="_blank" rel="noopener">https://ffmpeg.org/ffmpeg-codecs.html#libx264_002c-libx264rgb</a></p>
+<ul>
+<li><p><code>-I</code>, <code>keyint</code><br>設定 i-frame 間隔，也就是 GOP size</p>
+</li>
+<li><p><code>-i</code>, <code>--min-keyint</code><br>最小 GOP size</p>
+</li>
+<li><p><code>-r</code>, <code>--ref</code><br>控制 DPB（Decoded Picture Buffer） 大小，表示 P-frame 參照多少個 frame。預設值為 3，範圍：0 - 16。</p>
+</li>
+<li><p><code>--scenecut</code><br>配置動態 i-frame 的參考值；x264 的 frame 中會紀錄與參考 frame 的差異，當判斷差異過大時就是場景變更，此時就會插入一個 i-frame 來做紀錄，差異的依據可由設定 scenecut 來做判別，當設為 0 時等同 no-scenecut。</p>
+</li>
+<li><p><code>--no-scenecut</code><br>停用 adaptive I-frame decision</p>
+</li>
+</ul>
+<h2 id="參數優先順序"><a href="#參數優先順序" class="headerlink" title="參數優先順序"></a>參數優先順序</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">preset -&gt; tune -&gt; &quot;custom&quot; -&gt; profile -&gt; level</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/FFmpeg/" rel="tag"># FFmpeg</a>
+          
+            <a href="/tags/H264/" rel="tag"># H264</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/tech/FFmpeg-Common-Options/" rel="next" title="FFmpeg 常用選項">
+                <i class="fa fa-chevron-left"></i> FFmpeg 常用選項
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/tech/Media-basic-concept/" rel="prev" title="多媒體基本概念">
+                多媒體基本概念 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Tony Xu</p>
+  <div class="site-description motion-element" itemprop="description">希望藉由分享 & 紀錄，來讓自己的生活留下足跡，也希望藉由我的分享來幫助更多的人</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">30</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分類</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">69</span>
+        <span class="site-state-item-name">標籤</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/dexiang" title="GitHub &rarr; https://github.com/dexiang" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://www.linkedin.com/in/tony-xu/" title="Linkedin &rarr; https://www.linkedin.com/in/tony-xu/" rel="noopener" target="_blank"><i class="fa fa-fw fa-linkedin"></i>Linkedin</a>
+      </span>
+    
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#碼率控制（Rate-control）"><span class="nav-number">1.</span> <span class="nav-text">碼率控制（Rate control）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Constant-Rate-Factor（CRF）"><span class="nav-number">1.1.</span> <span class="nav-text">Constant Rate Factor（CRF）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Two-Pass-ABR（Average-Bitrate）"><span class="nav-number">1.2.</span> <span class="nav-text">Two-Pass ABR（Average Bitrate）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Preset"><span class="nav-number">2.</span> <span class="nav-text">Preset</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Tune-選項"><span class="nav-number">3.</span> <span class="nav-text">Tune 選項</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Profile"><span class="nav-number">4.</span> <span class="nav-text">Profile</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Level"><span class="nav-number">5.</span> <span class="nav-text">Level</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Decoded-picture-buffering"><span class="nav-number">5.1.</span> <span class="nav-text">Decoded picture buffering</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#自定義"><span class="nav-number">6.</span> <span class="nav-text">自定義</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#參數優先順序"><span class="nav-number">7.</span> <span class="nav-text">參數優先順序</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tony Xu</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 強力驅動 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主題 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
