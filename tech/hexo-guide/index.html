@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next muse use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '複製',
+      copy_success: '複製成功',
+      copy_failure: '複製失敗'
+    }
+  };
+</script>
+
+  <meta name="description" content="其實目前官網的文件非常詳細，這裡就不多做介紹了。 安裝 Hexo1$ npm install hexo-cli -g  建立 &amp;amp; 初始化123$ hexo init &amp;lt;folder&amp;gt;$ cd &amp;lt;folder&amp;gt;$ npm install  建立後會有以下資料夾 &amp;amp; 檔案 123456789.├── _config.yml # 網站設定檔├── package.">
+<meta name="keywords" content="hexo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo 指南">
+<meta property="og:url" content="https://blog.dexiang.me/tech/hexo-guide/index.html">
+<meta property="og:site_name" content="Tony 字傳">
+<meta property="og:description" content="其實目前官網的文件非常詳細，這裡就不多做介紹了。 安裝 Hexo1$ npm install hexo-cli -g  建立 &amp;amp; 初始化123$ hexo init &amp;lt;folder&amp;gt;$ cd &amp;lt;folder&amp;gt;$ npm install  建立後會有以下資料夾 &amp;amp; 檔案 123456789.├── _config.yml # 網站設定檔├── package.">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:updated_time" content="2019-08-09T04:18:50.239Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Hexo 指南">
+<meta name="twitter:description" content="其實目前官網的文件非常詳細，這裡就不多做介紹了。 安裝 Hexo1$ npm install hexo-cli -g  建立 &amp;amp; 初始化123$ hexo init &amp;lt;folder&amp;gt;$ cd &amp;lt;folder&amp;gt;$ npm install  建立後會有以下資料夾 &amp;amp; 檔案 123456789.├── _config.yml # 網站設定檔├── package.">
+  <link rel="alternate" href="/atom.xml" title="Tony 字傳" type="application/atom+xml">
+  <link rel="canonical" href="https://blog.dexiang.me/tech/hexo-guide/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Hexo 指南 | Tony 字傳</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Tony 字傳</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">紀錄 & 分享一切</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首頁</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-technology">
+      
+    
+
+    <a href="/categories/tech/" rel="section"><i class="menu-item-icon fa fa-fw fa-code"></i> <br>科技</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>標籤</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>歸檔</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜尋</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜尋..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.dexiang.me/tech/hexo-guide/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Tony Xu">
+      <meta itemprop="description" content="希望藉由分享 & 紀錄，來讓自己的生活留下足跡，也希望藉由我的分享來幫助更多的人">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tony 字傳">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">Hexo 指南
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2017-01-20 15:08:26" itemprop="dateCreated datePublished" datetime="2017-01-20T15:08:26+08:00">2017-01-20</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2019-08-09 12:18:50" itemprop="dateModified" datetime="2019-08-09T12:18:50+08:00">2019-08-09</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/tech/" itemprop="url" rel="index"><span itemprop="name">tech</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          <br>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>其實目前官網的文件非常詳細，這裡就不多做介紹了。</p>
+<h2 id="安裝-Hexo"><a href="#安裝-Hexo" class="headerlink" title="安裝 Hexo"></a>安裝 Hexo</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install hexo-cli -g</span><br></pre></td></tr></table></figure>
+
+<h2 id="建立-amp-初始化"><a href="#建立-amp-初始化" class="headerlink" title="建立 &amp; 初始化"></a>建立 &amp; 初始化</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ hexo init &lt;folder&gt;</span><br><span class="line">$ cd &lt;folder&gt;</span><br><span class="line">$ npm install</span><br></pre></td></tr></table></figure>
+
+<p>建立後會有以下資料夾 &amp; 檔案</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">├── _config.yml # 網站設定檔</span><br><span class="line">├── package.json</span><br><span class="line">├── scaffolds # 鷹架資料夾</span><br><span class="line">├── scripts # 腳本資料夾</span><br><span class="line">├── source</span><br><span class="line">|   ├── _drafts</span><br><span class="line">|   └── _posts</span><br><span class="line">└── themes # 主題</span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p>※ <a href="https://hexo.io/zh-tw/docs/configuration.html" title="Hexo Configuration" target="_blank" rel="noopener">官方設定檔文件</a></p>
+<h2 id="常用指令"><a href="#常用指令" class="headerlink" title="常用指令"></a>常用指令</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># 查看幫助</span><br><span class="line">hexo help</span><br><span class="line"># 新建文章</span><br><span class="line">hexo new &quot;postName&quot;</span><br><span class="line"># 新建頁面</span><br><span class="line">hexo new page &quot;pageName&quot;</span><br><span class="line"># 產生靜態網頁</span><br><span class="line">hexo generate</span><br><span class="line"># 本機預覽</span><br><span class="line">hexo server</span><br><span class="line"># 部署</span><br><span class="line">hexo deploy</span><br><span class="line"># 清除暫存，執行前建議使用</span><br><span class="line">hexo clean</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<h3 id="簡寫"><a href="#簡寫" class="headerlink" title="簡寫"></a>簡寫</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt; hexo n == hexo new</span><br><span class="line">&gt; hexo g == hexo generate</span><br><span class="line">&gt; hexo s == hexo server</span><br><span class="line">&gt; hexo d == hexo deploy</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<h2 id="部署到-Git"><a href="#部署到-Git" class="headerlink" title="部署到 Git"></a>部署到 Git</h2><p>透過 Git 發佈，安裝 Git 套件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install hexo-deployer-git --save</span><br></pre></td></tr></table></figure>
+
+<p>修改 <code>_config.yml</code> 設定值</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># Deployment</span><br><span class="line">deploy:</span><br><span class="line">  type: git</span><br><span class="line">  repo: git@github.com:dexiang/dexiang.github.io.git</span><br><span class="line">  branch: master</span><br><span class="line">  message:</span><br></pre></td></tr></table></figure>
+
+<p>設定好以後就可以部署了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>GitHub Page</p>
+</blockquote>
+<h2 id="Domain-Name-設定"><a href="#Domain-Name-設定" class="headerlink" title="Domain Name 設定"></a>Domain Name 設定</h2><p>首先當然要先有 Domain Name 啦～ 設定好以後，可透過 CNAME 設定到部落格上。</p>
+<p>另外在每次 deploy 到 Github 上時，CNAME 會一直被覆蓋，怎麼辦呢？</p>
+<p>安裝 CNAME，在 deploy 時自動產生 CNAME 檔案</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install hexo-generator-cname --save</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ cd source/</span><br><span class="line">$ touch CNAME</span><br><span class="line">$ vim CNAME # 輸入domain，EX：dexiang.tw</span><br></pre></td></tr></table></figure>
+
+<h2 id="主題"><a href="#主題" class="headerlink" title="主題"></a>主題</h2><p>每一家的 Theme 都有長處，可依個人喜好，以下是以 github 星星數整理出來的排名。</p>
+<blockquote>
+<ol>
+<li><p>NexT</p>
+<p><a href="https://github.com/iissnan/hexo-theme-next" title="star: 7303" target="_blank" rel="noopener">https://github.com/iissnan/hexo-theme-next</a></p>
+</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="2">
+<li><p>Yilia</p>
+<p><a href="https://github.com/litten/hexo-theme-yilia" title="star: 3136" target="_blank" rel="noopener">https://github.com/litten/hexo-theme-yilia</a></p>
+</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="3">
+<li><p>Tranquilpeak</p>
+<p><a href="https://github.com/LouisBarranqueiro/hexo-theme-tranquilpeak" title="940" target="_blank" rel="noopener">https://github.com/LouisBarranqueiro/hexo-theme-tranquilpeak</a></p>
+</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="4">
+<li><p>Yelee</p>
+<p><a href="https://github.com/MOxFIVE/hexo-theme-yelee" title="848" target="_blank" rel="noopener">https://github.com/MOxFIVE/hexo-theme-yelee</a></p>
+</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="5">
+<li><p>Jacman</p>
+<p><a href="https://github.com/wuchong/jacman" title="743" target="_blank" rel="noopener">https://github.com/wuchong/jacman</a></p>
+</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="6">
+<li><p>Maupassant</p>
+<p><a href="https://github.com/tufu9441/maupassant-hexo" title="875" target="_blank" rel="noopener">https://github.com/tufu9441/maupassant-hexo</a></p>
+</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="7">
+<li><p>Apollo</p>
+<p><a href="https://github.com/pinggod/hexo-theme-apollo" title="814" target="_blank" rel="noopener">https://github.com/pinggod/hexo-theme-apollo</a></p>
+</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="8">
+<li><p>Icarus</p>
+<p><a href="https://github.com/ppoffice/hexo-theme-icarus" title="789" target="_blank" rel="noopener">https://github.com/ppoffice/hexo-theme-icarus</a></p>
+</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="9">
+<li><p>Material</p>
+<p><a href="https://github.com/viosey/hexo-theme-material" title="1236" target="_blank" rel="noopener">https://github.com/viosey/hexo-theme-material</a></p>
+</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="10">
+<li><p>Fexo</p>
+<p><a href="https://github.com/forsigner/fexo" title="646" target="_blank" rel="noopener">https://github.com/forsigner/fexo</a></p>
+</li>
+</ol>
+</blockquote>
+<p>我選用的是 <code>Yilia Theme</code></p>
+<h2 id="常見問題"><a href="#常見問題" class="headerlink" title="常見問題"></a>常見問題</h2><ol>
+<li>修改配置時需注意 <code>YAML</code> 語法，參數冒號後 (:) 一定要留一個空格</li>
+<li>所有問題請轉成 UTF-8 格式</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/hexo/" rel="tag"># hexo</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/tech/hexo-introduction/" rel="next" title="Hexo 簡介">
+                <i class="fa fa-chevron-left"></i> Hexo 簡介
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/tech/hexo-draft/" rel="prev" title="Hexo 草稿">
+                Hexo 草稿 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Tony Xu</p>
+  <div class="site-description motion-element" itemprop="description">希望藉由分享 & 紀錄，來讓自己的生活留下足跡，也希望藉由我的分享來幫助更多的人</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">30</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分類</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">69</span>
+        <span class="site-state-item-name">標籤</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/dexiang" title="GitHub &rarr; https://github.com/dexiang" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://www.linkedin.com/in/tony-xu/" title="Linkedin &rarr; https://www.linkedin.com/in/tony-xu/" rel="noopener" target="_blank"><i class="fa fa-fw fa-linkedin"></i>Linkedin</a>
+      </span>
+    
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#安裝-Hexo"><span class="nav-number">1.</span> <span class="nav-text">安裝 Hexo</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#建立-amp-初始化"><span class="nav-number">2.</span> <span class="nav-text">建立 &amp; 初始化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置"><span class="nav-number">3.</span> <span class="nav-text">配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常用指令"><span class="nav-number">4.</span> <span class="nav-text">常用指令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#簡寫"><span class="nav-number">4.1.</span> <span class="nav-text">簡寫</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#部署到-Git"><span class="nav-number">5.</span> <span class="nav-text">部署到 Git</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Domain-Name-設定"><span class="nav-number">6.</span> <span class="nav-text">Domain Name 設定</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#主題"><span class="nav-number">7.</span> <span class="nav-text">主題</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常見問題"><span class="nav-number">8.</span> <span class="nav-text">常見問題</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tony Xu</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 強力驅動 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主題 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next muse use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '複製',
+      copy_success: '複製成功',
+      copy_failure: '複製失敗'
+    }
+  };
+</script>
+
+  <meta name="description" content="近年來雲端平台的服務應該大家都不陌生吧～它讓我們可以將維護與建置的工作交付給雲端平台去處理；雲端化以後 IT 維護改由雲端供應商負責，讓我們能花更多的專注力在創新研發上，還能加速部署與模型的建置，使得產品業務更靈活。 那麼，到底該怎麼挑選適合自己公司的雲端？先來基礎複習一下，主要的三種雲端服務類型 IaaS（Infrastructure as a Service，基礎設施即服務）、PasS（Pla">
+<meta name="keywords" content="AWS,GCP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="雲端 PK - AWS &amp; GCP">
+<meta property="og:url" content="https://blog.dexiang.me/tech/gcp-vs-aws/index.html">
+<meta property="og:site_name" content="Tony 字傳">
+<meta property="og:description" content="近年來雲端平台的服務應該大家都不陌生吧～它讓我們可以將維護與建置的工作交付給雲端平台去處理；雲端化以後 IT 維護改由雲端供應商負責，讓我們能花更多的專注力在創新研發上，還能加速部署與模型的建置，使得產品業務更靈活。 那麼，到底該怎麼挑選適合自己公司的雲端？先來基礎複習一下，主要的三種雲端服務類型 IaaS（Infrastructure as a Service，基礎設施即服務）、PasS（Pla">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:image" content="https://blog.dexiang.me/tech/gcp-vs-aws/separation_of_responsibilities.png">
+<meta property="og:updated_time" content="2019-08-09T04:18:50.222Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="雲端 PK - AWS &amp; GCP">
+<meta name="twitter:description" content="近年來雲端平台的服務應該大家都不陌生吧～它讓我們可以將維護與建置的工作交付給雲端平台去處理；雲端化以後 IT 維護改由雲端供應商負責，讓我們能花更多的專注力在創新研發上，還能加速部署與模型的建置，使得產品業務更靈活。 那麼，到底該怎麼挑選適合自己公司的雲端？先來基礎複習一下，主要的三種雲端服務類型 IaaS（Infrastructure as a Service，基礎設施即服務）、PasS（Pla">
+<meta name="twitter:image" content="https://blog.dexiang.me/tech/gcp-vs-aws/separation_of_responsibilities.png">
+  <link rel="alternate" href="/atom.xml" title="Tony 字傳" type="application/atom+xml">
+  <link rel="canonical" href="https://blog.dexiang.me/tech/gcp-vs-aws/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>雲端 PK - AWS & GCP | Tony 字傳</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Tony 字傳</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">紀錄 & 分享一切</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首頁</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-technology">
+      
+    
+
+    <a href="/categories/tech/" rel="section"><i class="menu-item-icon fa fa-fw fa-code"></i> <br>科技</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>標籤</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>歸檔</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜尋</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜尋..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.dexiang.me/tech/gcp-vs-aws/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Tony Xu">
+      <meta itemprop="description" content="希望藉由分享 & 紀錄，來讓自己的生活留下足跡，也希望藉由我的分享來幫助更多的人">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tony 字傳">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">雲端 PK - AWS & GCP
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2017-06-06 19:18:13" itemprop="dateCreated datePublished" datetime="2017-06-06T19:18:13+08:00">2017-06-06</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2019-08-09 12:18:50" itemprop="dateModified" datetime="2019-08-09T12:18:50+08:00">2019-08-09</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/tech/" itemprop="url" rel="index"><span itemprop="name">tech</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          <br>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>近年來雲端平台的服務應該大家都不陌生吧～它讓我們可以將維護與建置的工作交付給雲端平台去處理；雲端化以後 IT 維護改由雲端供應商負責，讓我們能花更多的專注力在創新研發上，還能加速部署與模型的建置，使得產品業務更靈活。</p>
+<p>那麼，到底該怎麼挑選適合自己公司的雲端？先來基礎複習一下，主要的三種雲端服務類型 IaaS（Infrastructure as a Service，基礎設施即服務）、PasS（Platform as a Service，平台即服務）、SaaS（Software as a Service，軟體即服務），各家平台在服務上也略有不同：</p>
+<img src="/tech/gcp-vs-aws/separation_of_responsibilities.png" title="Separation of Responsibilities">
+
+<a id="more"></a>
+
+<h2 id="該選哪朵雲？"><a href="#該選哪朵雲？" class="headerlink" title="該選哪朵雲？"></a>該選哪朵雲？</h2><h3 id="基礎建設"><a href="#基礎建設" class="headerlink" title="基礎建設"></a>基礎建設</h3><table>
+<thead>
+<tr>
+<th></th>
+<th align="center">AWS</th>
+<th align="center">GCP</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>地理區域數量</td>
+<td align="center">16 regions, 42 zones</td>
+<td align="center">9 regions, 27 zones</td>
+</tr>
+<tr>
+<td>未來擴點</td>
+<td align="center">3 regions</td>
+<td align="center">8 regions, 20 zones</td>
+</tr>
+<tr>
+<td>Taiwan 有無 regions</td>
+<td align="center">X</td>
+<td align="center">V</td>
+</tr>
+<tr>
+<td>Link</td>
+<td align="center"><a href="https://aws.amazon.com/tw/about-aws/global-infrastructure/" title="AWS 簡介" target="_blank" rel="noopener">https://aws.amazon.com/tw/about-aws/global-infrastructure/</a></td>
+<td align="center"><a href="https://cloud.google.com/about/locations/" title="GCP 簡介" target="_blank" rel="noopener">https://cloud.google.com/about/locations/</a></td>
+</tr>
+</tbody></table>
+<h3 id="機器類型-amp-運算能力"><a href="#機器類型-amp-運算能力" class="headerlink" title="機器類型 &amp; 運算能力"></a>機器類型 &amp; 運算能力</h3><p>GCP 可自訂機器類型，但價錢來說差不多</p>
+<h3 id="計費方式"><a href="#計費方式" class="headerlink" title="計費方式"></a>計費方式</h3><ul>
+<li>GCP 以分計費，提供免費服務 (特定機器)</li>
+<li>AWS 以時計費</li>
+</ul>
+<blockquote>
+<p>試算工具<br>AWS：<a href="http://calculator.s3.amazonaws.com/index.html" target="_blank" rel="noopener">http://calculator.s3.amazonaws.com/index.html</a><br>GCP：<a href="https://cloud.google.com/products/calculator/" target="_blank" rel="noopener">https://cloud.google.com/products/calculator/</a></p>
+</blockquote>
+<h3 id="服務項目"><a href="#服務項目" class="headerlink" title="服務項目"></a>服務項目</h3><ul>
+<li>AWS 種類玲琅滿目</li>
+<li>GCP 服務較少</li>
+</ul>
+<h2 id="服務對照"><a href="#服務對照" class="headerlink" title="服務對照"></a>服務對照</h2><table>
+<thead>
+<tr>
+<th></th>
+<th align="center">AWS</th>
+<th align="center">GCP</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>雲端虛擬伺服器</td>
+<td align="center">Amazon EC2</td>
+<td align="center">Google Compute Engine</td>
+</tr>
+<tr>
+<td>無伺服器</td>
+<td align="center">AWS Lambda</td>
+<td align="center">Google Cloud Functions</td>
+</tr>
+<tr>
+<td>隔離雲端資源</td>
+<td align="center">Amazon Virtual Private Cloud (VPC)</td>
+<td align="center">Google Cloud Virtual Network</td>
+</tr>
+<tr>
+<td>雲端儲存</td>
+<td align="center">Amazon S3</td>
+<td align="center">Google Cloud Storage</td>
+</tr>
+<tr>
+<td>關聯式資料庫</td>
+<td align="center">Amazon RDS</td>
+<td align="center">Google Cloud SQL</td>
+</tr>
+<tr>
+<td>NoSQL</td>
+<td align="center">Amazon DynamoDB</td>
+<td align="center">Google Cloud Bigtable</td>
+</tr>
+<tr>
+<td>CDN</td>
+<td align="center">AWS Cloudfront</td>
+<td align="center">Google Cloud CDN</td>
+</tr>
+<tr>
+<td>監控</td>
+<td align="center">Amazon CloudWatch</td>
+<td align="center">Google Cloud Monitoring and Google Cloud Logging</td>
+</tr>
+<tr>
+<td>權限管理</td>
+<td align="center">AWS Identity and Access Management (IAM)</td>
+<td align="center">Google Cloud Identity &amp; Access Management (Cloud IAM)</td>
+</tr>
+<tr>
+<td>DNS</td>
+<td align="center">Amazon Route 53</td>
+<td align="center">Google Cloud DNS</td>
+</tr>
+</tbody></table>
+<h2 id="結語"><a href="#結語" class="headerlink" title="結語"></a>結語</h2><p>大多數的人聽到雲端，第一個想到的大多都是 AWS，但目前各家雲端競爭激烈，除了上述介紹的以外還有 MS 的 Azure 等，各家也不斷的在推出新的服務及費率，也或許不會只採用一家的服務，建議還是依照自己的需求選擇自己合適的服務。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/AWS/" rel="tag"># AWS</a>
+          
+            <a href="/tags/GCP/" rel="tag"># GCP</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/tech/about-hyper-text-transfer-protocol/" rel="next" title="簡介 HTTP & HTTPS & HTTP2 協定">
+                <i class="fa fa-chevron-left"></i> 簡介 HTTP & HTTPS & HTTP2 協定
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/tech/remove-ds-store/" rel="prev" title="刪除 .DS_Store 隱藏檔">
+                刪除 .DS_Store 隱藏檔 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Tony Xu</p>
+  <div class="site-description motion-element" itemprop="description">希望藉由分享 & 紀錄，來讓自己的生活留下足跡，也希望藉由我的分享來幫助更多的人</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">30</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分類</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">69</span>
+        <span class="site-state-item-name">標籤</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/dexiang" title="GitHub &rarr; https://github.com/dexiang" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://www.linkedin.com/in/tony-xu/" title="Linkedin &rarr; https://www.linkedin.com/in/tony-xu/" rel="noopener" target="_blank"><i class="fa fa-fw fa-linkedin"></i>Linkedin</a>
+      </span>
+    
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#該選哪朵雲？"><span class="nav-number">1.</span> <span class="nav-text">該選哪朵雲？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基礎建設"><span class="nav-number">1.1.</span> <span class="nav-text">基礎建設</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#機器類型-amp-運算能力"><span class="nav-number">1.2.</span> <span class="nav-text">機器類型 &amp; 運算能力</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#計費方式"><span class="nav-number">1.3.</span> <span class="nav-text">計費方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#服務項目"><span class="nav-number">1.4.</span> <span class="nav-text">服務項目</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服務對照"><span class="nav-number">2.</span> <span class="nav-text">服務對照</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#結語"><span class="nav-number">3.</span> <span class="nav-text">結語</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tony Xu</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 強力驅動 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主題 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

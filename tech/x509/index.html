@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next muse use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '複製',
+      copy_success: '複製成功',
+      copy_failure: '複製失敗'
+    }
+  };
+</script>
+
+  <meta name="description" content="延續上次簡介密碼學的時候有談到 PKI，今天要來看看 X.509 這個廣為使用的數位憑證標準。   先來複習一下名詞吧  Symmetric Encryption：對稱加密，加解密用同一把鎖Asymmetric Encryption：非對稱加密，用兩把鎖配合來加解密Public Key：非對稱加密中可公開的鎖Private Key：非對稱加密中的私鑰，絕對不可外流Signature：數位簽章，通常">
+<meta name="keywords" content="PKI,X.509,CA,certificate">
+<meta property="og:type" content="article">
+<meta property="og:title" content="X.509">
+<meta property="og:url" content="https://blog.dexiang.me/tech/x509/index.html">
+<meta property="og:site_name" content="Tony 字傳">
+<meta property="og:description" content="延續上次簡介密碼學的時候有談到 PKI，今天要來看看 X.509 這個廣為使用的數位憑證標準。   先來複習一下名詞吧  Symmetric Encryption：對稱加密，加解密用同一把鎖Asymmetric Encryption：非對稱加密，用兩把鎖配合來加解密Public Key：非對稱加密中可公開的鎖Private Key：非對稱加密中的私鑰，絕對不可外流Signature：數位簽章，通常">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:image" content="https://blog.dexiang.me/tech/x509/X.509_Certificate_Format.png">
+<meta property="og:image" content="https://blog.dexiang.me/tech/x509/certificate-chain.gif">
+<meta property="og:image" content="https://blog.dexiang.me/tech/x509/google-certificate.png">
+<meta property="og:image" content="https://blog.dexiang.me/tech/x509/safe_SSL.png">
+<meta property="og:image" content="https://blog.dexiang.me/tech/x509/unsafe_SSL.png">
+<meta property="og:updated_time" content="2019-08-09T04:18:50.254Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="X.509">
+<meta name="twitter:description" content="延續上次簡介密碼學的時候有談到 PKI，今天要來看看 X.509 這個廣為使用的數位憑證標準。   先來複習一下名詞吧  Symmetric Encryption：對稱加密，加解密用同一把鎖Asymmetric Encryption：非對稱加密，用兩把鎖配合來加解密Public Key：非對稱加密中可公開的鎖Private Key：非對稱加密中的私鑰，絕對不可外流Signature：數位簽章，通常">
+<meta name="twitter:image" content="https://blog.dexiang.me/tech/x509/X.509_Certificate_Format.png">
+  <link rel="alternate" href="/atom.xml" title="Tony 字傳" type="application/atom+xml">
+  <link rel="canonical" href="https://blog.dexiang.me/tech/x509/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>X.509 | Tony 字傳</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Tony 字傳</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">紀錄 & 分享一切</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首頁</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-technology">
+      
+    
+
+    <a href="/categories/tech/" rel="section"><i class="menu-item-icon fa fa-fw fa-code"></i> <br>科技</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>標籤</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>歸檔</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜尋</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜尋..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.dexiang.me/tech/x509/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Tony Xu">
+      <meta itemprop="description" content="希望藉由分享 & 紀錄，來讓自己的生活留下足跡，也希望藉由我的分享來幫助更多的人">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tony 字傳">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">X.509
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-05-15 17:45:35" itemprop="dateCreated datePublished" datetime="2018-05-15T17:45:35+08:00">2018-05-15</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2019-08-09 12:18:50" itemprop="dateModified" datetime="2019-08-09T12:18:50+08:00">2019-08-09</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/tech/" itemprop="url" rel="index"><span itemprop="name">tech</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          <br>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>延續上次簡介密碼學的時候有談到 PKI，今天要來看看 X.509 這個廣為使用的數位憑證標準。</p>
+
+
+<p>先來複習一下名詞吧</p>
+<blockquote>
+<p>Symmetric Encryption：對稱加密，加解密用同一把鎖<br>Asymmetric Encryption：非對稱加密，用兩把鎖配合來加解密<br>Public Key：非對稱加密中可公開的鎖<br>Private Key：非對稱加密中的私鑰，絕對不可外流<br>Signature：數位簽章，通常是利用內容的 Hash 和 Private Key 所產生的，用來識別發送端身份<br>Man-in-the-middle attack：中間人攻擊指的是駭客利用攔截和偽裝公鑰交換來竄改和轉發訊息<br>PKI：公開金鑰基礎架構提供公鑰和證書的管理<br>CA：Certificate Authority，認證機構也就是憑證簽發的機構<br>Certificate：由 CA 所發的憑證，包含擁有者的資訊、CA、有效日期等訊息<br>CSR（Certificate Signing Request）：憑證簽發請求文件，要透過這份文件去跟 CA 申請憑證  </p>
+</blockquote>
+<a id="more"></a>
+
+<p>要是對上面沒印象的話就需要去看之前寫的 “<a href="/tech/cryptography-introduction/" title="密碼學簡介">密碼學簡介</a>” 或者 Google 一下相關資訊</p>
+<h2 id="什麼是-X-509"><a href="#什麼是-X-509" class="headerlink" title="什麼是 X.509"></a>什麼是 X.509</h2><p>X.509 是一種 PKI 的標準，由 ITU-T（國際電信聯盟）在 1988 年制定，基於其以前所制定的 ASN.1 標準。X.509 已用運在許多的面向，包括 TLS/SSL、IOT、電子簽名等等。</p>
+<h3 id="Certificate-結構"><a href="#Certificate-結構" class="headerlink" title="Certificate 結構"></a>Certificate 結構</h3><p>在 X.509 憑證採用了 ASN.1 標準，當中包含了公鑰、身份資訊、簽名資訊、有效日期等資訊，大致結構如下：</p>
+<img src="/tech/x509/X.509_Certificate_Format.png" title="X.509 Certificate Format">
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">Certificate: 憑證 </span><br><span class="line">- Version: 版本</span><br><span class="line">- Serial Number: 序號</span><br><span class="line">- Signature Algorithm ID: 憑證簽署演算法 ID</span><br><span class="line">- Issuer: 簽發者</span><br><span class="line">- Validity: 有效期</span><br><span class="line">-- Not Before: 此日期前無效</span><br><span class="line">-- Not After: 此日期後無效</span><br><span class="line">- Subject: 擁有者</span><br><span class="line">- Subject Public Key Info: 擁有者公鑰資訊</span><br><span class="line">-- Public Key Algorithm: 公鑰演算法</span><br><span class="line">-- Subject Public Key: 公鑰</span><br><span class="line">- Issuer Unique Identifier (Optional): 簽發者唯一識別</span><br><span class="line">- Subject Unique Identifier (Optional): 擁有者唯一識別</span><br><span class="line">- Extensions (Optional): 擴充</span><br><span class="line">- Certificate Signature Algorithm: 憑證簽署演算法</span><br><span class="line">- Certificate Signature: 憑證簽章值</span><br></pre></td></tr></table></figure>
+
+<h3 id="Certificate-副檔名"><a href="#Certificate-副檔名" class="headerlink" title="Certificate 副檔名"></a>Certificate 副檔名</h3><p>X.509 中常用的副檔名如下，其中部分還有其他用途：</p>
+<ul>
+<li><p>.pem -(Privacy Enhanced Mail)：<br>以 Base64 編碼 DER 憑證，並存放在 “—–BEGIN CERTIFICATE—–” 和 “—–END CERTIFICATE—–” 之間。</p>
+</li>
+<li><p>.cer, .crt, .der<br>常使用二進位的 DER 編碼或 Base64 編碼做憑證</p>
+</li>
+<li><p>.p7b, .p7c<br>PKCS#7 憑證結構，不包含資料。</p>
+</li>
+<li><p>.p12<br>PKCS#12 格式包含憑證的公鑰及私鑰 (同時有密碼保護)。</p>
+</li>
+<li><p>.pfx<br>PFX, PKCS#12 的前身</p>
+</li>
+<li><p>.bks<br>Android 用的憑證，由 Bouncy Castle 所實現的 Java Keystore</p>
+</li>
+</ul>
+<h2 id="什麼是-Certificate-Chain"><a href="#什麼是-Certificate-Chain" class="headerlink" title="什麼是 Certificate Chain"></a>什麼是 Certificate Chain</h2><p>Certificate Chain（憑證鏈）顧名思義是一連串的 Certificate，由 Root CA（根憑證）為起點所延伸出的憑證鏈，在鏈中的每張證書都需要透過前一張驗證</p>
+<img src="/tech/x509/certificate-chain.gif" title="Certificate Chain">
+
+<p>讓我們來看看 Google 的憑證鏈吧：在 Google 使用 HTTPS 時會需要一張 Certificate，而透過瀏覽器我們可以查看到這張 Certificate 所核發的是 <code>*.google.com</code>，代表著 google.com 下的所有網站皆適用這張憑證。然後一路追溯到 GlobalSign 這張根憑證，而 GlobalSign 包含在瀏覽器之中，故可以被信任。</p>
+<img src="/tech/x509/google-certificate.png" title="Google Certificate">
+
+<h2 id="X-509-Sample"><a href="#X-509-Sample" class="headerlink" title="X.509 Sample"></a>X.509 Sample</h2><p>延續上面的，以 Google 的憑證來做範例，這裡就解碼來看一下憑證的內容，驗證一下剛剛的理論吧。</p>
+<img src="/tech/x509/safe_SSL.png" title="safe SSL">
+
+<p>在瀏覽器之中會認得數家的 CA，透過憑證鏈可得知是由誰所核發的憑證，所以只要是認可的 CA 所核發的就沒有問題了。</p>
+<img src="/tech/x509/unsafe_SSL.png" title="unsafe SSL">
+
+<p>但是連上沒有擁有認可過憑證的網站的話就會發出警告並交由用戶決定。</p>
+<p>而最後瀏覽器傳送了 key 給 Service，這就要講到 SSL 的交握過程了，非對稱加密雖然安全，但同時犧牲了速度，所以 SSL 採用階段式的做法，在第一階段用非對稱加密，來傳送 “Key”，而這把 Key 就是第二階段對稱加密用來傳送資料的。</p>
+<p>然後讓我們來看看憑證內容吧，這裡我節錄了 <a href="http://www.google.com" target="_blank" rel="noopener">www.google.com</a> 的憑證</p>
+<p>第一張憑證是 <code>*.googlecomtw.crt</code>，從 Subject 的 CN 中可以看出他是給哪個 host 用的，裡面也提到了用的是 SHA-256 with RAS 演算法和簽發者是 Google Internet Authority G3 Validity。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">Certificate:</span><br><span class="line">    Data:</span><br><span class="line">        Version: 3 (0x2)</span><br><span class="line">        Serial Number: 4164209266253688074 (0x39ca3e43c570ed0a)</span><br><span class="line">    Signature Algorithm: sha256WithRSAEncryption</span><br><span class="line">        Issuer: C=US, O=Google Trust Services, CN=Google Internet Authority G3</span><br><span class="line">        Validity</span><br><span class="line">            Not Before: Apr 17 13:42:40 2018 GMT</span><br><span class="line">            Not After : Jul 10 12:39:00 2018 GMT</span><br><span class="line">        Subject: C=US, ST=California, L=Mountain View, O=Google Inc, CN=*.google.com.tw</span><br><span class="line">        Subject Public Key Info:</span><br><span class="line">            Public Key Algorithm: rsaEncryption</span><br><span class="line">                Public-Key: (2048 bit)</span><br><span class="line">                Modulus:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00</span><br><span class="line">                Exponent: 65537 (0x10001)</span><br><span class="line"></span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>而要驗證 <code>*.googlecomtw.crt</code> 這張憑證則需要驗證 <code>GoogleInternetAuthorityG3.crt</code> 這張憑證，同樣也需要下一張憑證來驗證。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">Certificate:</span><br><span class="line">    Data:</span><br><span class="line">        Version: 3 (0x2)</span><br><span class="line">        Serial Number:</span><br><span class="line">            01:e3:a9:30:1c:fc:72:06:38:3f:9a:53:1d</span><br><span class="line">    Signature Algorithm: sha256WithRSAEncryption</span><br><span class="line">        Issuer: OU=GlobalSign Root CA - R2, O=GlobalSign, CN=GlobalSign</span><br><span class="line">        Validity</span><br><span class="line">            Not Before: Jun 15 00:00:42 2017 GMT</span><br><span class="line">            Not After : Dec 15 00:00:42 2021 GMT</span><br><span class="line">        Subject: C=US, O=Google Trust Services, CN=Google Internet Authority G3</span><br><span class="line">        Subject Public Key Info:</span><br><span class="line">            Public Key Algorithm: rsaEncryption</span><br><span class="line">                Public-Key: (2048 bit)</span><br><span class="line">                Modulus:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00</span><br><span class="line">                Exponent: 65537 (0x10001)</span><br><span class="line">                </span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p><code>GlobalSignRootCA-R2.crt</code> 則是一張根憑證，因為是自己簽署的，所以 Subject 和 會一樣。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">Certificate:</span><br><span class="line">    Data:</span><br><span class="line">        Version: 3 (0x2)</span><br><span class="line">        Serial Number:</span><br><span class="line">            04:00:00:00:00:01:0f:86:26:e6:0d</span><br><span class="line">    Signature Algorithm: sha1WithRSAEncryption</span><br><span class="line">        Issuer: OU=GlobalSign Root CA - R2, O=GlobalSign, CN=GlobalSign</span><br><span class="line">        Validity</span><br><span class="line">            Not Before: Dec 15 08:00:00 2006 GMT</span><br><span class="line">            Not After : Dec 15 08:00:00 2021 GMT</span><br><span class="line">        Subject: OU=GlobalSign Root CA - R2, O=GlobalSign, CN=GlobalSign</span><br><span class="line">        Subject Public Key Info:</span><br><span class="line">            Public Key Algorithm: rsaEncryption</span><br><span class="line">                Public-Key: (2048 bit)</span><br><span class="line">                Modulus:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:</span><br><span class="line">                    00:00</span><br><span class="line">                Exponent: 65537 (0x10001)</span><br><span class="line">                </span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>了解了概念以後就來實做看看吧～</p>
+<h2 id="實作-X-509"><a href="#實作-X-509" class="headerlink" title="實作 X.509"></a>實作 X.509</h2><h3 id="產生金鑰"><a href="#產生金鑰" class="headerlink" title="產生金鑰"></a>產生金鑰</h3><p>一開始要先有 RSA 公私鑰</p>
+<h4 id="產生私鑰"><a href="#產生私鑰" class="headerlink" title="產生私鑰"></a>產生私鑰</h4><figure class="highlight zsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ openssl genrsa -out private.key 2048</span><br><span class="line"><span class="comment"># 產生長度為 2048 bits 名為 private.key 的 public key</span></span><br><span class="line"><span class="comment"># 長度越長越安全，但加解密時間越長</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="藉由私鑰產生公鑰"><a href="#藉由私鑰產生公鑰" class="headerlink" title="藉由私鑰產生公鑰"></a>藉由私鑰產生公鑰</h4><figure class="highlight zsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ openssl rsa -<span class="keyword">in</span> private.key -pubout -out public.key</span><br><span class="line"><span class="comment"># -in 輸入私鑰</span></span><br><span class="line"><span class="comment"># -pubout 代表輸出一個公鑰</span></span><br><span class="line"><span class="comment"># -out 公鑰檔名</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="產生-CSR"><a href="#產生-CSR" class="headerlink" title="產生 CSR"></a>產生 CSR</h3><p>要跟 CA 申請憑證的第一步就是要有身份證明文件，但私鑰是不能流出的而且資訊也不太充足，透過 CSR ，裡面會包含許多資訊來給 CA 去做簽署</p>
+<figure class="highlight zsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ openssl req –new –key private.key -out CSR.csr</span><br><span class="line"><span class="comment"># -new 表示產生 CSR</span></span><br><span class="line"><span class="comment"># -key 搭配的 key</span></span><br></pre></td></tr></table></figure>
+
+<p>在 CSR 可能含有以下資訊</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Common Name [CN]：簽署名稱，也就是網域名稱</span><br><span class="line">Organization [O]：組織名稱</span><br><span class="line">Organizational Unit [OU]：組織單位，若沒填寫則跟 Common Name 相同</span><br><span class="line">Country [C]：所在國家</span><br><span class="line">State [ST]：所在的州或省</span><br><span class="line">Locality [L]：所在城市</span><br><span class="line">Key Size：憑證演算法與金鑰長度</span><br></pre></td></tr></table></figure>
+
+<h3 id="產生證書"><a href="#產生證書" class="headerlink" title="產生證書"></a>產生證書</h3><h4 id="自簽-Root-憑證"><a href="#自簽-Root-憑證" class="headerlink" title="自簽 Root 憑證"></a>自簽 Root 憑證</h4><figure class="highlight zsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ openssl x509 -req -days 365 \</span><br><span class="line">-<span class="keyword">in</span> CSR.csr \</span><br><span class="line">-signkey private.key \</span><br><span class="line">-out RootCA.crt</span><br></pre></td></tr></table></figure>
+
+<h4 id="用-Root-CA-簽發憑證"><a href="#用-Root-CA-簽發憑證" class="headerlink" title="用 Root CA 簽發憑證"></a>用 Root CA 簽發憑證</h4><p>做一個新的 private key &amp; CSR，private2.key &amp; CSR2.csr</p>
+<figure class="highlight zsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ openssl x509 -req -days 3650 \</span><br><span class="line">-CA RootCA.crt \</span><br><span class="line">-<span class="keyword">in</span> CSR2.csr \</span><br><span class="line">-CAkey private2.key \</span><br><span class="line">-out myhost.crt</span><br></pre></td></tr></table></figure>
+
+<h3 id="查看-PEM-編碼憑證"><a href="#查看-PEM-編碼憑證" class="headerlink" title="查看 PEM 編碼憑證"></a>查看 PEM 編碼憑證</h3><figure class="highlight zsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ openssl x509 -<span class="keyword">in</span> certificate.pem -text -noout</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/PKI/" rel="tag"># PKI</a>
+          
+            <a href="/tags/X-509/" rel="tag"># X.509</a>
+          
+            <a href="/tags/CA/" rel="tag"># CA</a>
+          
+            <a href="/tags/certificate/" rel="tag"># certificate</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/tech/cryptography-introduction/" rel="next" title="密碼學簡介">
+                <i class="fa fa-chevron-left"></i> 密碼學簡介
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/tech/prettify_your_mac_terminal/" rel="prev" title="打造好用且美觀的 command line">
+                打造好用且美觀的 command line <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Tony Xu</p>
+  <div class="site-description motion-element" itemprop="description">希望藉由分享 & 紀錄，來讓自己的生活留下足跡，也希望藉由我的分享來幫助更多的人</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">30</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分類</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">69</span>
+        <span class="site-state-item-name">標籤</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/dexiang" title="GitHub &rarr; https://github.com/dexiang" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://www.linkedin.com/in/tony-xu/" title="Linkedin &rarr; https://www.linkedin.com/in/tony-xu/" rel="noopener" target="_blank"><i class="fa fa-fw fa-linkedin"></i>Linkedin</a>
+      </span>
+    
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#什麼是-X-509"><span class="nav-number">1.</span> <span class="nav-text">什麼是 X.509</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Certificate-結構"><span class="nav-number">1.1.</span> <span class="nav-text">Certificate 結構</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Certificate-副檔名"><span class="nav-number">1.2.</span> <span class="nav-text">Certificate 副檔名</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#什麼是-Certificate-Chain"><span class="nav-number">2.</span> <span class="nav-text">什麼是 Certificate Chain</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#X-509-Sample"><span class="nav-number">3.</span> <span class="nav-text">X.509 Sample</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#實作-X-509"><span class="nav-number">4.</span> <span class="nav-text">實作 X.509</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#產生金鑰"><span class="nav-number">4.1.</span> <span class="nav-text">產生金鑰</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#產生私鑰"><span class="nav-number">4.1.1.</span> <span class="nav-text">產生私鑰</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#藉由私鑰產生公鑰"><span class="nav-number">4.1.2.</span> <span class="nav-text">藉由私鑰產生公鑰</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#產生-CSR"><span class="nav-number">4.2.</span> <span class="nav-text">產生 CSR</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#產生證書"><span class="nav-number">4.3.</span> <span class="nav-text">產生證書</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#自簽-Root-憑證"><span class="nav-number">4.3.1.</span> <span class="nav-text">自簽 Root 憑證</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#用-Root-CA-簽發憑證"><span class="nav-number">4.3.2.</span> <span class="nav-text">用 Root CA 簽發憑證</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看-PEM-編碼憑證"><span class="nav-number">4.4.</span> <span class="nav-text">查看 PEM 編碼憑證</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tony Xu</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 強力驅動 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主題 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

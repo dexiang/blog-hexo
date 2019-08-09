@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next muse use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '複製',
+      copy_success: '複製成功',
+      copy_failure: '複製失敗'
+    }
+  };
+</script>
+
+  <meta name="description" content="GPS 英文全名是：Global Positioning System，全球定位系統 一般來說要表示地理位置都會用座標來標示，實際上用座標是不夠清楚的，因為所指的座標是用什麼基準的並沒有說明。明確的地理位置會用大地基準（Datum）＋坐標格式（Format／Grid）兩個參數來標示。">
+<meta name="keywords" content="GPS,Datum,TWD67,TWD97,WGS84,Haversine,Vincenty">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GPS 簡介">
+<meta property="og:url" content="https://blog.dexiang.me/tech/GPS-introduction/index.html">
+<meta property="og:site_name" content="Tony 字傳">
+<meta property="og:description" content="GPS 英文全名是：Global Positioning System，全球定位系統 一般來說要表示地理位置都會用座標來標示，實際上用座標是不夠清楚的，因為所指的座標是用什麼基準的並沒有說明。明確的地理位置會用大地基準（Datum）＋坐標格式（Format／Grid）兩個參數來標示。">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:image" content="https://blog.dexiang.me/tech/GPS-introduction/great-circle-distance.jpg">
+<meta property="og:image" content="https://blog.dexiang.me/tech/GPS-introduction/great-circle-distance-formula.png">
+<meta property="og:image" content="https://blog.dexiang.me/tech/GPS-introduction/haversine-formula.png">
+<meta property="og:image" content="https://blog.dexiang.me/tech/GPS-introduction/ellipse.png">
+<meta property="og:updated_time" content="2019-08-09T04:18:50.190Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="GPS 簡介">
+<meta name="twitter:description" content="GPS 英文全名是：Global Positioning System，全球定位系統 一般來說要表示地理位置都會用座標來標示，實際上用座標是不夠清楚的，因為所指的座標是用什麼基準的並沒有說明。明確的地理位置會用大地基準（Datum）＋坐標格式（Format／Grid）兩個參數來標示。">
+<meta name="twitter:image" content="https://blog.dexiang.me/tech/GPS-introduction/great-circle-distance.jpg">
+  <link rel="alternate" href="/atom.xml" title="Tony 字傳" type="application/atom+xml">
+  <link rel="canonical" href="https://blog.dexiang.me/tech/GPS-introduction/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>GPS 簡介 | Tony 字傳</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Tony 字傳</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">紀錄 & 分享一切</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首頁</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-technology">
+      
+    
+
+    <a href="/categories/tech/" rel="section"><i class="menu-item-icon fa fa-fw fa-code"></i> <br>科技</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>標籤</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>歸檔</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜尋</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜尋..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.dexiang.me/tech/GPS-introduction/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Tony Xu">
+      <meta itemprop="description" content="希望藉由分享 & 紀錄，來讓自己的生活留下足跡，也希望藉由我的分享來幫助更多的人">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tony 字傳">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">GPS 簡介
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-04-23 13:07:35" itemprop="dateCreated datePublished" datetime="2018-04-23T13:07:35+08:00">2018-04-23</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2019-08-09 12:18:50" itemprop="dateModified" datetime="2019-08-09T12:18:50+08:00">2019-08-09</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/tech/" itemprop="url" rel="index"><span itemprop="name">tech</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          <br>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>GPS 英文全名是：Global Positioning System，全球定位系統</p>
+<p>一般來說要表示地理位置都會用座標來標示，實際上用座標是不夠清楚的，因為所指的座標是用什麼基準的並沒有說明。明確的地理位置會用大地基準（Datum）＋坐標格式（Format／Grid）兩個參數來標示。</p>
+<a id="more"></a>
+
+<h2 id="大地座標系統（Datum）"><a href="#大地座標系統（Datum）" class="headerlink" title="大地座標系統（Datum）"></a>大地座標系統（Datum）</h2><p>Datum 是由數學模式所計算出來的地球外形，目前台灣常見的有三種：TWD67、TWD97、WGS84；其中 TWD67 是依據 1967 年的國際地球原子參數所定，以埔里虎子山為測量原點；TWD97 是依據 1980 年的國際地球原子參數而定；WGS84 則是以地球質心為原點，透過遍佈世界的衛星觀測站觀測到的坐標而建立的。</p>
+<h2 id="座標格式"><a href="#座標格式" class="headerlink" title="座標格式"></a>座標格式</h2><p>經緯度在表示時因“度”單位太大，所以將度細分為分＆秒，一度 60 分，一分 60 秒，故有三種表示法：</p>
+<ul>
+<li>DD 度 : 41.40338, 2.17403</li>
+<li>DMM 度分 : 41 24.2028, 2 10.4418</li>
+<li>DMS 度分秒 : 41°24’12.2”N 2°10’26.5”E</li>
+</ul>
+<h2 id="座標距離"><a href="#座標距離" class="headerlink" title="座標距離"></a>座標距離</h2><p>因地球並非正圓體，而是在赤道地區較膨脹＆兩極扁平，呈橢圓體，故在計算兩點距離時並不是這麼好計算。</p>
+<h3 id="法一："><a href="#法一：" class="headerlink" title="法一："></a>法一：</h3><p>假設地球為圓球體，計算球體上兩個點的距離又稱大圓距離 (The Great Circle Distance)：</p>
+<img src="/tech/GPS-introduction/great-circle-distance.jpg" title="Great-circle Distance">
+
+<p>可利用 <a href="https://en.wikipedia.org/wiki/Great-circle_distance" target="_blank" rel="noopener">Great-circle distance</a> 公式：</p>
+<img src="/tech/GPS-introduction/great-circle-distance-formula.png" title="Great-circle Distance Formula">
+
+<p>或利用 <a href="https://en.wikipedia.org/wiki/Haversine_formula" target="_blank" rel="noopener">Haversine</a> 公式：</p>
+<img src="/tech/GPS-introduction/haversine-formula.png" title="Haversine Formula">
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a = sin²(Δφ/2) + cos φ1 ⋅ cos φ2 ⋅ sin²(Δλ/2) </span><br><span class="line">c = 2 ⋅ atan2( √a, √(1−a) )</span><br><span class="line">d = R ⋅ c</span><br></pre></td></tr></table></figure>
+
+<h4 id="JS-Code"><a href="#JS-Code" class="headerlink" title="JS Code"></a>JS Code</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">function distanceByHaversine(lat1, lon1, lat2, lon2) &#123;</span><br><span class="line">    var R = 6371e3; // metres</span><br><span class="line">    var φ1 = lat1 * Math.PI / 180;</span><br><span class="line">    var φ2 = lat2 * Math.PI / 180;</span><br><span class="line">    var Δφ = (lat2-lat1) * Math.PI / 180;</span><br><span class="line">    var Δλ = (lon2-lon1) * Math.PI / 180;</span><br><span class="line"></span><br><span class="line">    var a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +</span><br><span class="line">            Math.cos(φ1) * Math.cos(φ2) *</span><br><span class="line">            Math.sin(Δλ/2) * Math.sin(Δλ/2);</span><br><span class="line">    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));</span><br><span class="line"></span><br><span class="line">    var d = R * c;</span><br><span class="line"></span><br><span class="line">    return d;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="PHP-Code"><a href="#PHP-Code" class="headerlink" title="PHP Code"></a>PHP Code</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">function distanceByHaversine($lat1, $lon1, $lat2, $lon2)</span><br><span class="line">&#123;</span><br><span class="line">    $R = 6371e3; // metres</span><br><span class="line"></span><br><span class="line">    $latR1 = $lat1 * pi() / 180;</span><br><span class="line">    $lonR1 = $lon1 * pi() / 180;</span><br><span class="line">    $latR2 = $lat2 * pi() / 180;</span><br><span class="line">    $lonR2 = $lon2 * pi() / 180;</span><br><span class="line"></span><br><span class="line">    $x = $latR2 - $latR1;</span><br><span class="line">    $y = $lonR2 - $lonR1;</span><br><span class="line"></span><br><span class="line">    $a = sin($x / 2) * sin($x / 2) + cos($latR1) * cos($latR2) * sin($y / 2) * sin($y / 2);</span><br><span class="line">    $c = 2 * atan2(sqrt($a), sqrt(1 - $a));</span><br><span class="line">    $d = $R * $c;</span><br><span class="line"></span><br><span class="line">    return $d;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="法二："><a href="#法二：" class="headerlink" title="法二："></a>法二：</h3><p>然而地球不是正圓體，如果用上述的方式難免有誤差，因此 Thaddeus Vincenty 在 1975 年提出了 <a href="https://en.wikipedia.org/wiki/Vincenty%27s_formulae" target="_blank" rel="noopener">Vincenty’s formula</a> 以用來計算橢圓球體，可精確到 0.5 mm 以內</p>
+<img src="/tech/GPS-introduction/ellipse.png" title="ellipse">
+
+<!--<table>
+<tr>
+    <td>a</td>
+    <td>橢圓體半長軸長度（赤道半徑）</td>
+    <td>6378137.0m（WGS84）</td>
+</tr>
+<tr>
+    <td>ƒ</td>
+    <td>扁率</td>
+    <td>1/298.257223563（WGS84）</td>
+</tr>
+<tr>
+    <td>b = (1 − ƒ) a</td>
+    <td>橢球體半短軸長度（兩極半徑）</td>
+    <td>6356752.314245m（WGS84）</td>
+</tr>
+</table>-->
+
+<table><tr><td>a</td><td>橢圓體半長軸長度（赤道半徑）</td><td>6378137.0m（WGS84）</td></tr><tr><td>ƒ</td><td>扁率</td><td>1/298.257223563（WGS84）</td></tr><tr><td>b = (1 − ƒ) a</td><td>橢球體半短軸長度（兩極半徑）</td><td>6356752.314245m（WGS84）</td></tr></table>
+
+
+<h4 id="JS-Code-1"><a href="#JS-Code-1" class="headerlink" title="JS Code"></a>JS Code</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">function distanceByVincenty(lat1, long1, lat2, long2) &#123;</span><br><span class="line">    var a = 6378137;</span><br><span class="line">    var b = 6356752.314245;</span><br><span class="line">    var f = 1 / 298.257223563;</span><br><span class="line"></span><br><span class="line">    var φ1 = lat1 * Math.PI / 180;</span><br><span class="line">    var λ1 = long1 * Math.PI / 180;</span><br><span class="line">    var φ2 = lat2 * Math.PI / 180;</span><br><span class="line">    var λ2 = long2 * Math.PI / 180;</span><br><span class="line"></span><br><span class="line">    var L = λ2 - λ1;</span><br><span class="line">    var tanU1 = (1-f) * Math.tan(φ1), cosU1 = 1 / Math.sqrt((1 + tanU1*tanU1)), sinU1 = tanU1 * cosU1;</span><br><span class="line">    var tanU2 = (1-f) * Math.tan(φ2), cosU2 = 1 / Math.sqrt((1 + tanU2*tanU2)), sinU2 = tanU2 * cosU2;</span><br><span class="line"></span><br><span class="line">    var λ = L, λʹ, iterationLimit = 100;</span><br><span class="line">    do &#123;</span><br><span class="line">        var sinλ = Math.sin(λ), cosλ = Math.cos(λ);</span><br><span class="line">        var sinSqσ = (cosU2*sinλ) * (cosU2*sinλ) + (cosU1*sinU2-sinU1*cosU2*cosλ) * (cosU1*sinU2-sinU1*cosU2*cosλ);</span><br><span class="line">        var sinσ = Math.sqrt(sinSqσ);</span><br><span class="line">        if (sinσ==0) return 0;  // co-incident points</span><br><span class="line">        var cosσ = sinU1*sinU2 + cosU1*cosU2*cosλ;</span><br><span class="line">        var σ = Math.atan2(sinσ, cosσ);</span><br><span class="line">        var sinα = cosU1 * cosU2 * sinλ / sinσ;</span><br><span class="line">        var cosSqα = 1 - sinα*sinα;</span><br><span class="line">        var cos2σM = cosσ - 2*sinU1*sinU2/cosSqα;</span><br><span class="line">        if (isNaN(cos2σM)) cos2σM = 0;  // equatorial line: cosSqα=0 (§6)</span><br><span class="line">        var C = f/16*cosSqα*(4+f*(4-3*cosSqα));</span><br><span class="line">        λʹ = λ;</span><br><span class="line">        λ = L + (1-C) * f * sinα * (σ + C*sinσ*(cos2σM+C*cosσ*(-1+2*cos2σM*cos2σM)));</span><br><span class="line">    &#125; while (Math.abs(λ-λʹ) &gt; 1e-12 &amp;&amp; --iterationLimit&gt;0);</span><br><span class="line">    if (iterationLimit==0) throw new Error(&apos;Formula failed to converge&apos;);</span><br><span class="line"></span><br><span class="line">    var uSq = cosSqα * (a*a - b*b) / (b*b);</span><br><span class="line">    var A = 1 + uSq/16384*(4096+uSq*(-768+uSq*(320-175*uSq)));</span><br><span class="line">    var B = uSq/1024 * (256+uSq*(-128+uSq*(74-47*uSq)));</span><br><span class="line">    var Δσ = B*sinσ*(cos2σM+B/4*(cosσ*(-1+2*cos2σM*cos2σM)-</span><br><span class="line">        B/6*cos2σM*(-3+4*sinσ*sinσ)*(-3+4*cos2σM*cos2σM)));</span><br><span class="line"></span><br><span class="line">    var s = b*A*(σ-Δσ);</span><br><span class="line"></span><br><span class="line">    var fwdAz = Math.atan2(cosU2*sinλ,  cosU1*sinU2-sinU1*cosU2*cosλ);</span><br><span class="line">    var revAz = Math.atan2(cosU1*sinλ, -sinU1*cosU2+cosU1*sinU2*cosλ);</span><br><span class="line"></span><br><span class="line">    return s</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="PHP-Code-1"><a href="#PHP-Code-1" class="headerlink" title="PHP Code"></a>PHP Code</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">function distanceByVincenty($lat1, $long1, $lat2, $long2)</span><br><span class="line">&#123;</span><br><span class="line">    $a = 6378137;</span><br><span class="line">    $b = 6356752.314245;</span><br><span class="line">    $f = 1 / 298.257223563;</span><br><span class="line">    $L = deg2rad($long2 - $long1);</span><br><span class="line"></span><br><span class="line">    $tanU1 = (1 - $f) * tan(deg2rad($lat1));</span><br><span class="line">    $cosU1 = 1 / sqrt(1 + $tanU1 * $tanU1);</span><br><span class="line">    $sinU1 = $tanU1 * $cosU1;</span><br><span class="line"></span><br><span class="line">    $tanU2 = (1 - $f) * tan(deg2rad($lat2));</span><br><span class="line">    $cosU2 = 1 / sqrt(1 + $tanU2 * $tanU2);</span><br><span class="line">    $sinU2 = $tanU2 * $cosU2;</span><br><span class="line"></span><br><span class="line">    $lambda = $L;</span><br><span class="line">    $iterLimit = 100;</span><br><span class="line">    do &#123;</span><br><span class="line">        $sinLambda = sin($lambda);</span><br><span class="line">        $cosLambda = cos($lambda);</span><br><span class="line">        $sinSigma = sqrt(($cosU2 * $sinLambda) * ($cosU2 * $sinLambda) + ($cosU1 * $sinU2 - $sinU1 * $cosU2 * $cosLambda) * ($cosU1 * $sinU2 - $sinU1 * $cosU2 * $cosLambda));</span><br><span class="line">        if ($sinSigma == 0) &#123;</span><br><span class="line">            return 0;</span><br><span class="line">        &#125;</span><br><span class="line">        $cosSigma = $sinU1 * $sinU2 + $cosU1 * $cosU2 * $cosLambda;</span><br><span class="line">        $sigma = atan2($sinSigma, $cosSigma);</span><br><span class="line">        $sinAlpha = $cosU1 * $cosU2 * $sinLambda / $sinSigma;</span><br><span class="line">        $cosSqAlpha = 1 - $sinAlpha * $sinAlpha;</span><br><span class="line">        if ($cosSqAlpha == 0) &#123;</span><br><span class="line">            $cos2SigmaM = 0;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            $cos2SigmaM = $cosSigma - 2 * $sinU1 * $sinU2 / $cosSqAlpha;</span><br><span class="line">        &#125;</span><br><span class="line">        $C = $f / 16 * $cosSqAlpha * (4 + $f * (4 - 3 * $cosSqAlpha));</span><br><span class="line">        $lambdaP = $lambda;</span><br><span class="line">        $lambda = $L + (1 - $C) * $f * $sinAlpha * ($sigma + $C * $sinSigma * ($cos2SigmaM + $C * $cosSigma * (-1 + 2 * $cos2SigmaM * $cos2SigmaM)));</span><br><span class="line">    &#125; while (abs($lambda - $lambdaP) &gt; 0.000000000001 &amp;&amp; --$iterLimit &gt; 0);</span><br><span class="line">    if ($iterLimit == 0) &#123;</span><br><span class="line">        return 0;</span><br><span class="line">    &#125;</span><br><span class="line">    $uSq = $cosSqAlpha * ($a * $a - $b * $b) / ($b * $b);</span><br><span class="line">    $A = 1 + $uSq / 16384 * (4096 + $uSq * (-768 + $uSq * (320 - 175 * $uSq)));</span><br><span class="line">    $B = $uSq / 1024 * (256 + $uSq * (-128 + $uSq * (74 - 47 * $uSq)));</span><br><span class="line">    $deltaSigma = $B * $sinSigma * ($cos2SigmaM + $B / 4 * ($cosSigma * (-1 + 2 * $cos2SigmaM * $cos2SigmaM) - $B / 6 * $cos2SigmaM * (-3 + 4 * $sinSigma * $sinSigma) * (-3 + 4 * $cos2SigmaM * $cos2SigmaM)));</span><br><span class="line">    return $b * $A * ($sigma - $deltaSigma);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/GPS/" rel="tag"># GPS</a>
+          
+            <a href="/tags/Datum/" rel="tag"># Datum</a>
+          
+            <a href="/tags/TWD67/" rel="tag"># TWD67</a>
+          
+            <a href="/tags/TWD97/" rel="tag"># TWD97</a>
+          
+            <a href="/tags/WGS84/" rel="tag"># WGS84</a>
+          
+            <a href="/tags/Haversine/" rel="tag"># Haversine</a>
+          
+            <a href="/tags/Vincenty/" rel="tag"># Vincenty</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/tech/File-Locking/" rel="next" title="File Locking">
+                <i class="fa fa-chevron-left"></i> File Locking
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/tech/golang-json/" rel="prev" title="Golang JSON 處理">
+                Golang JSON 處理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Tony Xu</p>
+  <div class="site-description motion-element" itemprop="description">希望藉由分享 & 紀錄，來讓自己的生活留下足跡，也希望藉由我的分享來幫助更多的人</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">30</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分類</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">69</span>
+        <span class="site-state-item-name">標籤</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/dexiang" title="GitHub &rarr; https://github.com/dexiang" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://www.linkedin.com/in/tony-xu/" title="Linkedin &rarr; https://www.linkedin.com/in/tony-xu/" rel="noopener" target="_blank"><i class="fa fa-fw fa-linkedin"></i>Linkedin</a>
+      </span>
+    
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#大地座標系統（Datum）"><span class="nav-number">1.</span> <span class="nav-text">大地座標系統（Datum）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#座標格式"><span class="nav-number">2.</span> <span class="nav-text">座標格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#座標距離"><span class="nav-number">3.</span> <span class="nav-text">座標距離</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#法一："><span class="nav-number">3.1.</span> <span class="nav-text">法一：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#JS-Code"><span class="nav-number">3.1.1.</span> <span class="nav-text">JS Code</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#PHP-Code"><span class="nav-number">3.1.2.</span> <span class="nav-text">PHP Code</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#法二："><span class="nav-number">3.2.</span> <span class="nav-text">法二：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#JS-Code-1"><span class="nav-number">3.2.1.</span> <span class="nav-text">JS Code</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#PHP-Code-1"><span class="nav-number">3.2.2.</span> <span class="nav-text">PHP Code</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tony Xu</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 強力驅動 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主題 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

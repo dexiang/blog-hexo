@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next muse use-motion" lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '複製',
+      copy_success: '複製成功',
+      copy_failure: '複製失敗'
+    }
+  };
+</script>
+
+  <meta name="description" content="在傳遞資料的時候，若是不希望別人看到，那麼我們就會把內容做適當的處理。在現實生活中其實隨處可見密碼學的概念，我們就來想像以下的情境吧。  Tony 想傳情書給 Whitney，但不想給別人看到，他們會怎麼做呢？  對稱加密（Symmetric Encryption） 一開始他們就把信交給郵差之前，將它裝到盒子裡上鎖，各拿一把鑰匙，透過郵差拿到盒子後再把鎖打開  對稱加密，溝通雙方拿著一樣的金鑰，有">
+<meta name="keywords" content="cryptography,對稱加密,Symmetric Encryption,非對稱加密,Asymmetric encryption,數位簽章,Signature,PKI,X.509,CA">
+<meta property="og:type" content="article">
+<meta property="og:title" content="密碼學簡介">
+<meta property="og:url" content="https://blog.dexiang.me/tech/cryptography-introduction/index.html">
+<meta property="og:site_name" content="Tony 字傳">
+<meta property="og:description" content="在傳遞資料的時候，若是不希望別人看到，那麼我們就會把內容做適當的處理。在現實生活中其實隨處可見密碼學的概念，我們就來想像以下的情境吧。  Tony 想傳情書給 Whitney，但不想給別人看到，他們會怎麼做呢？  對稱加密（Symmetric Encryption） 一開始他們就把信交給郵差之前，將它裝到盒子裡上鎖，各拿一把鑰匙，透過郵差拿到盒子後再把鎖打開  對稱加密，溝通雙方拿著一樣的金鑰，有">
+<meta property="og:locale" content="zh-TW">
+<meta property="og:image" content="https://blog.dexiang.me/tech/cryptography-introduction/asymmetric-cryptography.png">
+<meta property="og:image" content="https://blog.dexiang.me/tech/cryptography-introduction/MITM-step1.png">
+<meta property="og:image" content="https://blog.dexiang.me/tech/cryptography-introduction/MITM-step2.png">
+<meta property="og:image" content="https://blog.dexiang.me/tech/cryptography-introduction/MITM-step3.png">
+<meta property="og:image" content="https://blog.dexiang.me/tech/cryptography-introduction/PKI-init.png">
+<meta property="og:image" content="https://blog.dexiang.me/tech/cryptography-introduction/PKI-step1.png">
+<meta property="og:image" content="https://blog.dexiang.me/tech/cryptography-introduction/PKI-step2.png">
+<meta property="og:updated_time" content="2019-08-09T04:18:50.214Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="密碼學簡介">
+<meta name="twitter:description" content="在傳遞資料的時候，若是不希望別人看到，那麼我們就會把內容做適當的處理。在現實生活中其實隨處可見密碼學的概念，我們就來想像以下的情境吧。  Tony 想傳情書給 Whitney，但不想給別人看到，他們會怎麼做呢？  對稱加密（Symmetric Encryption） 一開始他們就把信交給郵差之前，將它裝到盒子裡上鎖，各拿一把鑰匙，透過郵差拿到盒子後再把鎖打開  對稱加密，溝通雙方拿著一樣的金鑰，有">
+<meta name="twitter:image" content="https://blog.dexiang.me/tech/cryptography-introduction/asymmetric-cryptography.png">
+  <link rel="alternate" href="/atom.xml" title="Tony 字傳" type="application/atom+xml">
+  <link rel="canonical" href="https://blog.dexiang.me/tech/cryptography-introduction/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>密碼學簡介 | Tony 字傳</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-TW">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Tony 字傳</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">紀錄 & 分享一切</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切換導航欄">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首頁</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-technology">
+      
+    
+
+    <a href="/categories/tech/" rel="section"><i class="menu-item-icon fa fa-fw fa-code"></i> <br>科技</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>標籤</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>歸檔</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜尋</a>
+        </li>
+      
+    </ul>
+    
+
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜尋..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.dexiang.me/tech/cryptography-introduction/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Tony Xu">
+      <meta itemprop="description" content="希望藉由分享 & 紀錄，來讓自己的生活留下足跡，也希望藉由我的分享來幫助更多的人">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tony 字傳">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">密碼學簡介
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">發表於</span>
+              
+
+              
+                
+              
+
+              <time title="創建時間：2018-05-10 17:01:32" itemprop="dateCreated datePublished" datetime="2018-05-10T17:01:32+08:00">2018-05-10</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新於</span>
+                
+                <time title="修改時間：2019-08-09 12:18:50" itemprop="dateModified" datetime="2019-08-09T12:18:50+08:00">2019-08-09</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分類於</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/tech/" itemprop="url" rel="index"><span itemprop="name">tech</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          <br>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>在傳遞資料的時候，若是不希望別人看到，那麼我們就會把內容做適當的處理。在現實生活中其實隨處可見密碼學的概念，我們就來想像以下的情境吧。</p>
+<blockquote>
+<p>Tony 想傳情書給 Whitney，但不想給別人看到，他們會怎麼做呢？</p>
+</blockquote>
+<h2 id="對稱加密（Symmetric-Encryption）"><a href="#對稱加密（Symmetric-Encryption）" class="headerlink" title="對稱加密（Symmetric Encryption）"></a>對稱加密（Symmetric Encryption）</h2><blockquote>
+<p>一開始他們就把信交給郵差之前，將它裝到盒子裡上鎖，各拿一把鑰匙，透過郵差拿到盒子後再把鎖打開</p>
+</blockquote>
+<p>對稱加密，溝通雙方拿著一樣的金鑰，有鑰匙的人就可以自由開關，而沒有鑰匙的人就算拿到保險箱也打不開，常見的有：DES、AES</p>
+<a id="more"></a>
+
+<h2 id="非對稱加密（Asymmetric-encryption）"><a href="#非對稱加密（Asymmetric-encryption）" class="headerlink" title="非對稱加密（Asymmetric encryption）"></a>非對稱加密（Asymmetric encryption）</h2><blockquote>
+<p>但是這又有一個問題了，當他們分隔兩地時，第一次要怎麼傳遞鑰匙呢？要是不小心被別人拿去了呢？所以他們就找了一個特製的鎖（如下圖），一把鑰匙只可以從 A 轉到 C（Kₚ），另一把只能從 C 到 A（Kₛ）。</p>
+<p>一開始 Tony 會把 Kₚ 寄給 Whitney，然後再把上鎖的盒子給她，Whitney 收到盒子後就可以用 Kₚ 打開。</p>
+<p>這樣的方法就算 Kₚ 流出，在傳遞的過程中也無法變造內容，因為需要 Kₛ 才能完整操作盒子。</p>
+</blockquote>
+<img src="/tech/cryptography-introduction/asymmetric-cryptography.png" title="Asymmetric Cryptography Box">
+
+<p>非對稱式加密會有兩個金鑰，通常給出去的稱作公鑰（Kₚ），留在本地的稱做私鑰（Kₛ），加解密是需要兩組配合才能運作。用私鑰加密，就要用公鑰解密；用公鑰加密就用私鑰解密。</p>
+<p>而實際狀況通常會是雙方都會有自己的公私鑰，也會有對方的公鑰。在 A 傳給 B 時用 B 的 Kₚ 加密，B 收到後再用自己的 Kₛ 解密；在 B 傳給 A 時用 A 的 Kₚ 加密，A 收到後用自己的 Kₛ 解密。</p>
+<p>依照這個特性，就不用怕公鑰流出去，因為需要私鑰的配合才能讓訊息加解密，而私鑰從來沒有流通過，就不可能被攔截。</p>
+<h2 id="數位簽章（Signature）"><a href="#數位簽章（Signature）" class="headerlink" title="數位簽章（Signature）"></a>數位簽章（Signature）</h2><blockquote>
+<p>上面的方法看起來安全了，但我們來想想看，假設中間 Tony 的公鑰在傳輸給 Whitney 時流出了，那麼 Tony 不就沒辦法驗證訊息是不是 Whitney 傳的嗎？</p>
+<p>他們就又想了一個方法，既然我們有兩個盒子，何不一個驗證身份一個驗證內容呢？</p>
+<p>所以 Tony 在傳送訊息同時，用自己的 Kₛ 加密身份，一起傳給 Whitney，Whitney 再用 Tony 的 Kₚ 來看是不是真的是 Tony 寄的訊息。這樣就可以確認內容跟身份都正確了。</p>
+</blockquote>
+<p>數位簽章利用的就是非對稱加密的特性，反向讓私鑰幫你加密訊息，公鑰解密。那麼可能有人會問，公鑰不是所有人都可能知道嗎？但不怕，因為就算可以用公鑰解密，那也只是知道是誰記得而已，訊息本身還是沒辦法得知。</p>
+<h2 id="中間人攻擊（Man-in-the-middle-attack）"><a href="#中間人攻擊（Man-in-the-middle-attack）" class="headerlink" title="中間人攻擊（Man-in-the-middle attack）"></a>中間人攻擊（Man-in-the-middle attack）</h2><blockquote>
+<p>剛剛上面的假設都是傳遞過程不被竄改，但要是內鬼就是郵差的話，會發生什麼事呢？</p>
+</blockquote>
+<img src="/tech/cryptography-introduction/MITM-step1.png" title="MITM Step1">
+
+<blockquote>
+<p>郵差拿到 Tony 的 Kₚ，並把自己的 Kₚ₁ 給 Whitney</p>
+</blockquote>
+<img src="/tech/cryptography-introduction/MITM-step2.png" title="MITM Step2">
+
+<blockquote>
+<p>郵差拿到 Whitney 的 Kₚ，並把自己的 Kₚ₂ 給 Tony</p>
+</blockquote>
+<img src="/tech/cryptography-introduction/MITM-step3.png" title="MITM Step3">
+
+<blockquote>
+<p>郵差拿到 Tony 的信和簽名時，如之前所說信是用 Whitney 的 Kₚ 加密（但這裡 Tony 拿到的其實是郵差的 Kₚ₂），簽名是用 Tony 的 Kₛ 加密，分別用郵差的 Kₛ₂ 和 Tony 的 Kₚ 解密，竄改後再用自己的 Kₛ₁ 和 Whitney 的 Kₚ 加密，這樣的話 Whitney 就會信以為真了</p>
+</blockquote>
+<p>非對稱加密在通訊的過程中若是經過了 Hacker 的路由，就有可能導致上述的狀況，也稱作中間人攻擊，為了對應這種情況而孕育出 PKI（Public Key Infrasture, 公鑰基礎建設）</p>
+<h2 id="PKI（Public-Key-Infrasture）"><a href="#PKI（Public-Key-Infrasture）" class="headerlink" title="PKI（Public Key Infrasture）"></a>PKI（Public Key Infrasture）</h2><blockquote>
+<p>有了上述的狀況，兩個人就想說是不是找一個認證過的機構來幫我們傳遞消息？可能是郵局、快遞公司，而不是一般的路人</p>
+</blockquote>
+<p>PKI 是提供公鑰加密和數位簽章服務的系统或平台，目的是為了管理金鑰和證書。這裡就不說明細部的數學計算，讓我們從流程來看看它是如何提供安全的服務。</p>
+<p><em>真實的流程中，用戶會透過 CSR 證書向認證機構（CA）申請 X.509 ，其中包含更多資訊，流程也比下圖複雜的多，這裡只簡單闡述概念。</em></p>
+<img src="/tech/cryptography-introduction/PKI-init.png" title="KPI Init">
+
+<blockquote>
+<p>一開始認證機構（CA）會給雙方機構的 Kₚ</p>
+</blockquote>
+<img src="/tech/cryptography-introduction/PKI-step1.png" title="KPI Step1">
+
+<blockquote>
+<p>Tony 將他的 Kₚ 送到機構去加密，經過機構的運算後，會回傳一張證書（Certificate）</p>
+</blockquote>
+<img src="/tech/cryptography-introduction/PKI-step2.png" title="KPI Step2">
+
+<blockquote>
+<p>Tony 就將 Certificate 和 Kₚ 傳給 Whitney，Whitney 利用機構的 Kₚ 解開 Certificate 後 得到 Kₚ’，Kₚ’ 和收到的 Kₚ 一致代表這個傳輸是可靠有效的。</p>
+</blockquote>
+<p>上面有提到 KPI 的一個特性，CA 的 Kₚ 通常會隨著系統、瀏覽器的安裝而包含在內，這也就是說 CA 的 Kₚ 不是透過傳輸，而是預先安裝在系統中的，也就不會再傳輸的過程中被攔截和竄改，這也就是“基礎設施”的由來。</p>
+<h2 id="結語"><a href="#結語" class="headerlink" title="結語"></a>結語</h2><p>資訊安全一直都是熱門的議題，近年來網路的運用越來越普及，像是 IOT 的裝置，或這者是微服務的盛行，每一個系統在設計時都少不了安全機制的考慮，而密碼學提供了保密性（Confidentiality）、完整性（Integrity）、可用性（Availability），透過密碼學的基礎設計安全的通道來讓各個服務溝通，以保系統安全無虞。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/cryptography/" rel="tag"># cryptography</a>
+          
+            <a href="/tags/對稱加密/" rel="tag"># 對稱加密</a>
+          
+            <a href="/tags/Symmetric-Encryption/" rel="tag"># Symmetric Encryption</a>
+          
+            <a href="/tags/非對稱加密/" rel="tag"># 非對稱加密</a>
+          
+            <a href="/tags/Asymmetric-encryption/" rel="tag"># Asymmetric encryption</a>
+          
+            <a href="/tags/數位簽章/" rel="tag"># 數位簽章</a>
+          
+            <a href="/tags/Signature/" rel="tag"># Signature</a>
+          
+            <a href="/tags/PKI/" rel="tag"># PKI</a>
+          
+            <a href="/tags/X-509/" rel="tag"># X.509</a>
+          
+            <a href="/tags/CA/" rel="tag"># CA</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/tech/golang-json/" rel="next" title="Golang JSON 處理">
+                <i class="fa fa-chevron-left"></i> Golang JSON 處理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/tech/x509/" rel="prev" title="X.509">
+                X.509 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目錄
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            本站概要
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Tony Xu</p>
+  <div class="site-description motion-element" itemprop="description">希望藉由分享 & 紀錄，來讓自己的生活留下足跡，也希望藉由我的分享來幫助更多的人</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">30</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分類</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">69</span>
+        <span class="site-state-item-name">標籤</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/dexiang" title="GitHub &rarr; https://github.com/dexiang" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://www.linkedin.com/in/tony-xu/" title="Linkedin &rarr; https://www.linkedin.com/in/tony-xu/" rel="noopener" target="_blank"><i class="fa fa-fw fa-linkedin"></i>Linkedin</a>
+      </span>
+    
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#對稱加密（Symmetric-Encryption）"><span class="nav-number">1.</span> <span class="nav-text">對稱加密（Symmetric Encryption）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#非對稱加密（Asymmetric-encryption）"><span class="nav-number">2.</span> <span class="nav-text">非對稱加密（Asymmetric encryption）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#數位簽章（Signature）"><span class="nav-number">3.</span> <span class="nav-text">數位簽章（Signature）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#中間人攻擊（Man-in-the-middle-attack）"><span class="nav-number">4.</span> <span class="nav-text">中間人攻擊（Man-in-the-middle attack）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PKI（Public-Key-Infrasture）"><span class="nav-number">5.</span> <span class="nav-text">PKI（Public Key Infrasture）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#結語"><span class="nav-number">6.</span> <span class="nav-text">結語</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tony Xu</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 強力驅動 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主題 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+      </div>
+
+    
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/schemes/muse.js?v=7.3.0"></script>
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
